@@ -26,7 +26,7 @@ var userDocs []map[string]string
 
 func openFile(doc_id string) {
 
-	jsonFile := "docs/" + doc_id + ".json"
+	jsonFile := "./cmd/APIRest/docs/" + doc_id + ".json"
 	fmt.Println(jsonFile)
 	file, err := os.Open(jsonFile)
 	if err != nil {
@@ -49,6 +49,27 @@ func openFile(doc_id string) {
 		return
 	}
 	fmt.Println(userDocs)
+}
+
+func writeFile(doc_id string, bodyContent []byte, bytesWriten *int) {
+
+	jsonFile := "./cmd/APIRest/docs/" + doc_id + ".json"
+	fmt.Println(jsonFile)
+	file, err := os.Create(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer file.Close()
+
+	*bytesWriten, err = file.Write(bodyContent)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+
 }
 
 func getVersion(c *gin.Context) {
@@ -129,7 +150,7 @@ func getDocs(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
-
+	fmt.Print(DocID)
 	if !authentification(tokenString, Username, c) {
 		return
 	}
@@ -165,6 +186,32 @@ func getDocs(c *gin.Context) {
 }
 
 func postDocs(c *gin.Context) {
+	tokenString := c.GetHeader("Authorization")
+	Username := c.Param("username")
+	DocID := c.Param("doc_id")
+	fmt.Print(DocID)
+
+	if !authentification(tokenString, Username, c) {
+		return
+	}
+
+	bodyContent, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request."})
+		return
+	}
+
+	user := users[Username]
+	user.DocsID = append(user.DocsID, DocID)
+	users[Username] = user
+
+	var bytesWriten int
+
+	fmt.Print(users[Username].DocsID)
+
+	writeFile(DocID, bodyContent, &bytesWriten)
+
+	c.JSON(http.StatusOK, gin.H{"size": bytesWriten})
 
 }
 
@@ -186,6 +233,7 @@ func main() {
 	router.GET("/version", getVersion)
 	router.POST("/signup", signUp)
 	router.POST("/login", login)
+	router.POST("/:username/:doc_id", postDocs)
 	router.Run("myserver.local:5000")
 
 }
