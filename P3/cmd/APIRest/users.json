@@ -1,0 +1,41 @@
+[
+ {
+  "username": "user1",
+  "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
+  "token": "token",
+  "docsID": [
+   "patatas"
+  ]
+ },
+ {
+  "username": "user2",
+  "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
+  "token": "token",
+  "docsID": [
+   "pisto"
+  ]
+ },
+ {
+  "username": "new_user",
+  "password": "$2a$10$xb8L16c2UJ4ggJk5qo7jcuLeHuTlwOTwos3NFOnZOppX24fjQzZIS",
+  "token": "token",
+  "docsID": []
+ },
+ {
+  "username": "hector",
+  "password": "$2a$10$C9xY2WEkK9dp3ye21k27n.PKf/O2SikI9ZggEsDht2jZ.1eLfkdhe",
+  "token": "token",
+  "docsID": [
+   "natillas"
+  ]
+ },
+ {
+  "username": "bart",
+  "password": "$2a$10$8IQsNshBvV5vDyWisQy4Ned0olhhtn5s5f6St0PL5PBXP5q/0adzK",
+  "token": "token",
+  "docsID": [
+   "natillas",
+   "quijote"
+  ]
+ }
+]
