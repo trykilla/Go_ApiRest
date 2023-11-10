@@ -25,9 +25,7 @@ This project implements a Go-based REST API for managing users and associated do
      ```json
      {
        "username": "newUser",
-       "password": "newPassword",
-       "token": "token ",
-       "docsID": ["document1", "document2"]
+       "password": "newPassword"
      }
      ```
 
@@ -45,12 +43,12 @@ This project implements a Go-based REST API for managing users and associated do
 4. **Get Documents Associated with a User**
    - Method: `GET`
    - Path: `/:username/:doc_id`
-   - Authorization Header: `Authorization: <token>`
+   - Authorization Header: `Authorization: token <token>`
 
 5. **Add New Document**
    - Method: `POST`
    - Path: `/:username/:doc_id`
-   - Authorization Header: `Authorization: <token>`
+   - Authorization Header: `Authorization: token <token>`
    - Request Body: Raw content of the document.
 
 ## Configuration and Execution
