@@ -11,8 +11,6 @@ import (
 	"os"
 )
 
-//import "strings"
-
 type User struct {
 	Username string   `json:"username"`
 	Password string   `json:"password"`
@@ -22,8 +20,6 @@ type User struct {
 
 var users = make(map[string]User)
 var userDocs []map[string]string
-
-//const token = "token 1234"
 
 func openFile(username string, doc_id string) {
 
@@ -336,18 +332,25 @@ func main() {
 
 	//fmt.Println("Hello, World!") // prints "Hello, World!"
 	router := gin.Default()
+
 	createDirectories()
 	importUsers()
 	fmt.Println("Users in the system:")
 	for _, user := range users {
 		fmt.Println(user.Username)
 	}
+
 	// router.GET("/cars/:car", getCars)
 	router.GET("/:username/:doc_id", getDocs)
 	router.GET("/version", getVersion)
 	router.POST("/signup", signUp)
 	router.POST("/login", login)
 	router.POST("/:username/:doc_id", postDocs)
-	router.Run("myserver.local:5000")
+
+	err := http.ListenAndServeTLS("myserver.local:5000", "myserver.local.pem", "myserver.local-key.pem", router)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 }
