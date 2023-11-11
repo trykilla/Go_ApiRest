@@ -11,6 +11,7 @@ This project implements a Go-based REST API for managing users and associated do
 
 - [Gin](https://github.com/gin-gonic/gin): Framework for building APIs in Go.
 - [bcrypt](https://golang.org/x/crypto/bcrypt): Library for secure password hashing.
+- [jwt-go](https://github.com/dgrijalva/jwt-go): JSON Web Tokens for authentication.
 
 ## Endpoints
 
@@ -51,12 +52,24 @@ This project implements a Go-based REST API for managing users and associated do
    - Authorization Header: `Authorization: token <token>`
    - Request Body: Raw content of the document.
 
+6. **Update Document**
+   - Method: `PUT`
+   - Path: `/:username/:doc_id`
+   - Authorization Header: `Authorization: token <token>`
+   - Request Body: Raw content of the updated document.
+
+7. **Delete Document**
+   - Method: `DELETE`
+   - Path: `/:username/:doc_id`
+   - Authorization Header: `Authorization: token <token>`
+
 ## Configuration and Execution
 
 1. **Install Dependencies:**
    ```bash
    go get -u github.com/gin-gonic/gin
    go get -u golang.org/x/crypto/bcrypt
+   go get -u github.com/dgrijalva/jwt-go
    ```
 
 2. **Run the Application:**
@@ -65,3 +78,7 @@ This project implements a Go-based REST API for managing users and associated do
    ```
 
 The application will run on `myserver.local:5000`. Ensure that you have proper hostname resolution or modify the address and port as needed.
+
+## Automated Tests
+
+Yet to be implemented.

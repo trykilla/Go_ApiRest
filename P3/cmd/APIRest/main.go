@@ -4,11 +4,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -20,6 +24,123 @@ type User struct {
 
 var users = make(map[string]User)
 var userDocs []map[string]string
+
+func createToken(username string) (string, error) {
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": username,
+		"exp":      time.Now().Add(20 * time.Second).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte("secret"))
+	if err != nil {
+
+		return "", err
+	}
+
+	return tokenString, nil
+
+}
+
+func checkExp(c *gin.Context, userToken string, expired *bool) {
+
+	tokenString := c.GetHeader("Authorization")
+	if tokenString == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not given."})
+		*expired = true
+		return
+	}
+
+	fmt.Println("Entering checkExp")
+
+	parts := strings.Split(tokenString, " ")
+	if len(parts) != 2 || parts[0] != "token" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Wrong format for token."})
+		*expired = true
+		c.Abort()
+		return
+	}
+
+	tokenString = parts[1]
+	fmt.Println("Token string from header", tokenString)
+
+	validatedToken, err := validateToken(tokenString)
+
+	if err != nil {
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is malformed."})
+				c.Abort()
+				*expired = true
+				return
+			} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired or not valid yet, please go to /login to get a new access token."})
+				c.Abort()
+				*expired = true
+				return
+			} else {
+
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not valid."})
+				c.Abort()
+				*expired = true
+				return
+			}
+		}
+
+		c.Abort()
+		*expired = true
+		return
+	}
+
+	claims, ok := validatedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Error getting claims."})
+		c.Abort()
+		*expired = true
+		return
+	}
+
+	expTime := time.Unix(int64(claims["exp"].(float64)), 0)
+	if time.Now().After(expTime) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired, you need to acces /login again."})
+		c.Abort()
+		*expired = true
+		return
+	}
+
+	if strings.Split(userToken, " ")[1] != tokenString {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
+		c.Abort()
+		*expired = true
+		return
+	}
+
+}
+
+func validateToken(tokenString string) (*jwt.Token, error) {
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("secret"), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+
+		return nil, fmt.Errorf("token is not valid")
+	}
+
+	return token, err
+
+}
 
 func openFile(username string, doc_id string) {
 
@@ -52,7 +173,7 @@ func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *
 
 	jsonFile := "./cmd/APIRest/docs/" + username + "/" + doc_id + ".json"
 	fmt.Println(jsonFile)
-	file, err := os.Create(jsonFile)
+	file, err := os.OpenFile(jsonFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -75,7 +196,7 @@ func getVersion(c *gin.Context) {
 func signUp(c *gin.Context) {
 
 	// tokenString := c.GetHeader("Authorization")
-	tokenString := "token"
+
 	// if tokenString == token {
 	// 	fmt.Println("Token correcto")
 	// }
@@ -93,6 +214,16 @@ func signUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password."})
 		return
 	}
+
+	
+	tokenString, err := createToken(user.Username)
+	if err != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating token."})
+		return
+	}
+
+	fmt.Print(tokenString)
 
 	user.Password = string(hashedPassword)
 	user.Token = tokenString
@@ -122,34 +253,35 @@ func login(c *gin.Context) {
 		return
 	}
 
-	var token string
-	if users[user.Username].Token != "token " {
-		token = users[user.Username].Token
-	} else {
-		user = users[user.Username]
-		user.Token += "1234"
-		token = user.Token
-		users[user.Username] = user
-	}
+	tokenString, err := createToken(user.Username)
+	if err != nil {
 
-	c.IndentedJSON(http.StatusOK, gin.H{"access_token": token})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating token."})
+		return
+	}
+	user.Username = users[user.Username].Username
+	user.Password = users[user.Username].Password
+	user.Token = tokenString
+	user.DocsID = users[user.Username].DocsID
+
+	users[user.Username] = user
+
+	c.IndentedJSON(http.StatusOK, gin.H{"access_token": tokenString})
 
 }
 
 func authentification(tokenString string, Username string, c *gin.Context) bool {
 
-	if tokenString == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found or token expired."})
+	expired := false
+	checkExp(c, tokenString, &expired)
+
+	if expired {
 		return false
 	}
-
-	fmt.Println("Token string", tokenString)
-	fmt.Println("User token", users[Username].Token)
-
-	if tokenString != users[Username].Token {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
-		return false
-	}
+	// if tokenString != users[Username].Token {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
+	// 	return false
+	// }
 
 	if _, exists := users[Username]; !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
@@ -164,6 +296,7 @@ func getDocs(c *gin.Context) {
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 
+	fmt.Println("User Token=", users[Username].Token)
 	if !authentification(tokenString, Username, c) {
 		return
 	}
@@ -193,7 +326,7 @@ func getDocs(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"doc": userDocs})
+	c.JSON(http.StatusOK, userDocs)
 	userDocs = nil
 
 }
@@ -227,6 +360,42 @@ func insertUser(user User) {
 
 }
 
+func putDocs(c *gin.Context) {
+
+	tokenString := c.GetHeader("Authorization")
+	Username := c.Param("username")
+	DocID := c.Param("doc_id")
+	flag := false
+
+	for _, str := range users[Username].DocsID {
+		if str == DocID {
+			flag = true
+			break
+		}
+	}
+
+	if !flag {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong id for this user, doc not found."})
+		return
+	}
+
+	if !authentification(tokenString, Username, c) {
+		return
+	}
+
+	bodyContent, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request."})
+		return
+	}
+
+	var bytesWriten int
+
+	writeFile(Username, DocID, bodyContent, &bytesWriten)
+
+	c.JSON(http.StatusOK, gin.H{"size": bytesWriten})
+}
+
 func postDocs(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
@@ -257,6 +426,39 @@ func postDocs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"size": bytesWriten})
 
+}
+
+func deleteDocs(c *gin.Context) {
+
+	tokenString := c.GetHeader("Authorization")
+	Username := c.Param("username")
+	DocID := c.Param("doc_id")
+	flag := false
+
+	if !authentification(tokenString, Username, c) {
+		return
+	}
+
+	for _, str := range users[Username].DocsID {
+		if str == DocID {
+			flag = true
+			break
+		}
+	}
+
+	if !flag {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong id for this user, doc not found."})
+		return
+	}
+
+	jsonFile := "./cmd/APIRest/docs/" + Username + "/" + DocID + ".json"
+	err := os.Remove(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func insertDocs(Username string, DocID string) {
@@ -346,8 +548,10 @@ func main() {
 	router.POST("/signup", signUp)
 	router.POST("/login", login)
 	router.POST("/:username/:doc_id", postDocs)
+	router.PUT("/:username/:doc_id", putDocs)
+	router.DELETE("/:username/:doc_id", deleteDocs)
 
-	err := http.ListenAndServeTLS("myserver.local:5000", "myserver.local.pem", "myserver.local-key.pem", router)
+	err := http.ListenAndServeTLS("myserver.local:5000", "certificates/myserver.local.pem", "certificates/myserver.local-key.pem", router)
 	if err != nil {
 		fmt.Println(err)
 		return

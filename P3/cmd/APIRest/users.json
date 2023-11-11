@@ -4,7 +4,8 @@
   "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
   "token": "token",
   "docsID": [
-   "patatas"
+   "patatas",
+   "pasta"
   ]
  },
  {
@@ -37,5 +38,47 @@
    "natillas",
    "quijote"
   ]
+ },
+ {
+  "username": "user4",
+  "password": "$2a$10$pwAi6gCmt.N5TmIINNbb1OctmJ960/WOmYJh7J77VnvgW8KbKgSrm",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzMyMDcsInVzZXJuYW1lIjoidXNlcjQifQ.DLsl1dbvaC9v6y4VjP_CbO_NkLf_vCrkJD16NPrFzgE",
+  "docsID": []
+ },
+ {
+  "username": "user5",
+  "password": "$2a$10$KeX/YlL7gygozU/dkUvI/.C4ym3Tz3F0a9PrVCuGKyjkzGenEWZLm",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzMzNDUsInVzZXJuYW1lIjoidXNlcjUifQ.w_uGa8XOGWzv5_DM9Rif0-Z_dnK0oz_1RtV3oPpdiS8",
+  "docsID": []
+ },
+ {
+  "username": "user6",
+  "password": "$2a$10$MUVWMHcrokIsJE7Ne.fiZ.kJi5OB6086y/tKM97/RusbeR19A2C8.",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM0ODcsInVzZXJuYW1lIjoidXNlcjYifQ.v3ihE3-OYO_JtNTv_2kD79sS75OWMaB5N2keP9ui3Eg",
+  "docsID": []
+ },
+ {
+  "username": "user7",
+  "password": "$2a$10$senWmnKTXE4l9XYSPiIj2.h1MXR7tN2fKUJ2ySbYr6WCS4h/l7rIG",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM1ODUsInVzZXJuYW1lIjoidXNlcjcifQ.SNVS337rVHUOqm4dHbb6jW-xer1gl7AjYPrrJlp7fsE",
+  "docsID": []
+ },
+ {
+  "username": "user8",
+  "password": "$2a$10$/qUotFzpxOmoEHEzTANY5O32S.CvZNeeVSIZOBuMpodINN1Llm.0y",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM3ODEsInVzZXJuYW1lIjoidXNlcjgifQ.LYxTAvdTnXyt3-Jtf1HTdA2EcOfwoHwWmXPwXHtGtBY",
+  "docsID": []
+ },
+ {
+  "username": "user9",
+  "password": "$2a$10$ImQ3QdKwdq/Bl6M32EZS4u8JHMf23bydx0oaUhiRwZYjKIkI0X8xe",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM5NTUsInVzZXJuYW1lIjoidXNlcjkifQ.XdPOKroj4U85dDpO5aDuDTuEhT8gqPAOXEoZ24QotP8",
+  "docsID": []
+ },
+ {
+  "username": "user10",
+  "password": "$2a$10$CeU.t3T5xEP7xaH79eqeFeaypSbNaGLhPgrBjet8uUSQQbRB.x97y",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzQyOTYsInVzZXJuYW1lIjoidXNlcjEwIn0.Y2gF9z5G2X6r8lnaogRZrZBaEdahlq_wQjiCyCCXLc8",
+  "docsID": []
  }
 ]
