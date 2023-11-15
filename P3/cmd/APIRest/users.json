@@ -4,8 +4,9 @@
   "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
   "token": "token",
   "docsID": [
-   "patatas",
-   "pasta"
+   "lasaña",
+   "pasta",
+   "lasaña2"
   ]
  },
  {
@@ -13,72 +14,17 @@
   "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
   "token": "token",
   "docsID": [
+   "natillas",
+   "pisto",
    "pisto"
   ]
  },
  {
-  "username": "new_user",
-  "password": "$2a$10$xb8L16c2UJ4ggJk5qo7jcuLeHuTlwOTwos3NFOnZOppX24fjQzZIS",
-  "token": "token",
-  "docsID": []
- },
- {
-  "username": "hector",
-  "password": "$2a$10$C9xY2WEkK9dp3ye21k27n.PKf/O2SikI9ZggEsDht2jZ.1eLfkdhe",
-  "token": "token",
+  "username": "user3",
+  "password": "$2a$10$48LVKyxK5QlpaalG5zC2suzpcKDkQ.zbWlflA77eUhtCZ0nK7evtK",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
   "docsID": [
-   "natillas"
+   "galletas"
   ]
- },
- {
-  "username": "bart",
-  "password": "$2a$10$8IQsNshBvV5vDyWisQy4Ned0olhhtn5s5f6St0PL5PBXP5q/0adzK",
-  "token": "token",
-  "docsID": [
-   "natillas",
-   "quijote"
-  ]
- },
- {
-  "username": "user4",
-  "password": "$2a$10$pwAi6gCmt.N5TmIINNbb1OctmJ960/WOmYJh7J77VnvgW8KbKgSrm",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzMyMDcsInVzZXJuYW1lIjoidXNlcjQifQ.DLsl1dbvaC9v6y4VjP_CbO_NkLf_vCrkJD16NPrFzgE",
-  "docsID": []
- },
- {
-  "username": "user5",
-  "password": "$2a$10$KeX/YlL7gygozU/dkUvI/.C4ym3Tz3F0a9PrVCuGKyjkzGenEWZLm",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzMzNDUsInVzZXJuYW1lIjoidXNlcjUifQ.w_uGa8XOGWzv5_DM9Rif0-Z_dnK0oz_1RtV3oPpdiS8",
-  "docsID": []
- },
- {
-  "username": "user6",
-  "password": "$2a$10$MUVWMHcrokIsJE7Ne.fiZ.kJi5OB6086y/tKM97/RusbeR19A2C8.",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM0ODcsInVzZXJuYW1lIjoidXNlcjYifQ.v3ihE3-OYO_JtNTv_2kD79sS75OWMaB5N2keP9ui3Eg",
-  "docsID": []
- },
- {
-  "username": "user7",
-  "password": "$2a$10$senWmnKTXE4l9XYSPiIj2.h1MXR7tN2fKUJ2ySbYr6WCS4h/l7rIG",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM1ODUsInVzZXJuYW1lIjoidXNlcjcifQ.SNVS337rVHUOqm4dHbb6jW-xer1gl7AjYPrrJlp7fsE",
-  "docsID": []
- },
- {
-  "username": "user8",
-  "password": "$2a$10$/qUotFzpxOmoEHEzTANY5O32S.CvZNeeVSIZOBuMpodINN1Llm.0y",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM3ODEsInVzZXJuYW1lIjoidXNlcjgifQ.LYxTAvdTnXyt3-Jtf1HTdA2EcOfwoHwWmXPwXHtGtBY",
-  "docsID": []
- },
- {
-  "username": "user9",
-  "password": "$2a$10$ImQ3QdKwdq/Bl6M32EZS4u8JHMf23bydx0oaUhiRwZYjKIkI0X8xe",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzM5NTUsInVzZXJuYW1lIjoidXNlcjkifQ.XdPOKroj4U85dDpO5aDuDTuEhT8gqPAOXEoZ24QotP8",
-  "docsID": []
- },
- {
-  "username": "user10",
-  "password": "$2a$10$CeU.t3T5xEP7xaH79eqeFeaypSbNaGLhPgrBjet8uUSQQbRB.x97y",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk3MzQyOTYsInVzZXJuYW1lIjoidXNlcjEwIn0.Y2gF9z5G2X6r8lnaogRZrZBaEdahlq_wQjiCyCCXLc8",
-  "docsID": []
  }
 ]

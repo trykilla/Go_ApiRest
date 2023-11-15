@@ -1,7 +1,7 @@
 [
-    {
-        "receta": "Pisto",
-        "ingredientes": "Tomate, pimiento, cebolla, calabacín, aceite, sal",
-        "tiempo": "30 minutos"
-    }
+  {
+    "Nombre" : "Pisto",
+    "Ingredientes" : "Tomate, pimiento, cebolla, calabacín, berenjena",
+    "Precio" : "5€"
+  }
 ]

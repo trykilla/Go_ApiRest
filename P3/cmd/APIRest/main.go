@@ -29,7 +29,7 @@ func createToken(username string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
-		"exp":      time.Now().Add(20 * time.Second).Unix(),
+		"exp":      time.Now().Add(120 * time.Second).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
@@ -45,7 +45,7 @@ func createToken(username string) (string, error) {
 func checkExp(c *gin.Context, userToken string, expired *bool) {
 
 	tokenString := c.GetHeader("Authorization")
-	if tokenString == "" {
+	if tokenString == "" || tokenString == "token" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not given."})
 		*expired = true
 		return
@@ -62,7 +62,7 @@ func checkExp(c *gin.Context, userToken string, expired *bool) {
 	}
 
 	tokenString = parts[1]
-	fmt.Println("Token string from header", tokenString)
+	
 
 	validatedToken, err := validateToken(tokenString)
 
@@ -195,11 +195,6 @@ func getVersion(c *gin.Context) {
 
 func signUp(c *gin.Context) {
 
-	// tokenString := c.GetHeader("Authorization")
-
-	// if tokenString == token {
-	// 	fmt.Println("Token correcto")
-	// }
 
 	var user User
 	c.BindJSON(&user)
@@ -215,7 +210,6 @@ func signUp(c *gin.Context) {
 		return
 	}
 
-	
 	tokenString, err := createToken(user.Username)
 	if err != nil {
 
@@ -270,8 +264,16 @@ func login(c *gin.Context) {
 
 }
 
-func authentification(tokenString string, Username string, c *gin.Context) bool {
+func authentification(tokenString string, user User, c *gin.Context) bool {
 
+	fmt.Println("User Token", user.Token)
+	fmt.Println("TokenString", tokenString[6:])
+
+	if user.Token != tokenString[6:] {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
+		return false
+	}
+	
 	expired := false
 	checkExp(c, tokenString, &expired)
 
@@ -283,7 +285,7 @@ func authentification(tokenString string, Username string, c *gin.Context) bool 
 	// 	return false
 	// }
 
-	if _, exists := users[Username]; !exists {
+	if _, exists := users[user.Username]; !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
 		return false
 	}
@@ -296,8 +298,10 @@ func getDocs(c *gin.Context) {
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 
-	fmt.Println("User Token=", users[Username].Token)
-	if !authentification(tokenString, Username, c) {
+	fmt.Println("User Token =", users[Username].Token)
+
+
+	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
@@ -379,7 +383,7 @@ func putDocs(c *gin.Context) {
 		return
 	}
 
-	if !authentification(tokenString, Username, c) {
+	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
@@ -402,7 +406,7 @@ func postDocs(c *gin.Context) {
 	DocID := c.Param("doc_id")
 	fmt.Print(DocID)
 
-	if !authentification(tokenString, Username, c) {
+	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
@@ -435,7 +439,7 @@ func deleteDocs(c *gin.Context) {
 	DocID := c.Param("doc_id")
 	flag := false
 
-	if !authentification(tokenString, Username, c) {
+	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
