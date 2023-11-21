@@ -1,18 +1,16 @@
 package main
 
-// import "fmt"
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"strings"
+	"fmt"
 	"time"
-
-	"github.com/dgrijalva/jwt-go"
+	"strings"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -39,7 +37,7 @@ func createToken(username string) (string, error) {
 	}
 
 	return tokenString, nil
-
+  
 }
 
 func checkExp(c *gin.Context, userToken string, expired *bool) {
@@ -62,8 +60,6 @@ func checkExp(c *gin.Context, userToken string, expired *bool) {
 	}
 
 	tokenString = parts[1]
-	
-
 	validatedToken, err := validateToken(tokenString)
 
 	if err != nil {
@@ -145,7 +141,7 @@ func validateToken(tokenString string) (*jwt.Token, error) {
 func openFile(username string, doc_id string) {
 
 	jsonFile := "./cmd/APIRest/docs/" + username + "/" + doc_id + ".json"
-	fmt.Println(jsonFile)
+	
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		fmt.Println(err)
@@ -166,7 +162,7 @@ func openFile(username string, doc_id string) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(userDocs)
+	
 }
 
 func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *int) {
@@ -194,7 +190,6 @@ func getVersion(c *gin.Context) {
 }
 
 func signUp(c *gin.Context) {
-
 
 	var user User
 	c.BindJSON(&user)
@@ -266,24 +261,22 @@ func login(c *gin.Context) {
 
 func authentification(tokenString string, user User, c *gin.Context) bool {
 
-	fmt.Println("User Token", user.Token)
-	fmt.Println("TokenString", tokenString[6:])
+	
+	if user.Token == "token" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not logged in."})
+		return false
+	}
 
 	if user.Token != tokenString[6:] {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
 		return false
 	}
-	
 	expired := false
 	checkExp(c, tokenString, &expired)
 
 	if expired {
 		return false
 	}
-	// if tokenString != users[Username].Token {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token for this user."})
-	// 	return false
-	// }
 
 	if _, exists := users[user.Username]; !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
@@ -298,8 +291,7 @@ func getDocs(c *gin.Context) {
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 
-	fmt.Println("User Token =", users[Username].Token)
-
+	//fmt.Println("User Token =", users[Username].Token)
 
 	if !authentification(tokenString, users[Username], c) {
 		return
@@ -405,6 +397,13 @@ func postDocs(c *gin.Context) {
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 	fmt.Print(DocID)
+
+	for _, str := range users[Username].DocsID {
+		if str == DocID {
+			c.JSON(http.StatusConflict, gin.H{"error": "Doc already exists."})
+			return
+		}
+	}
 
 	if !authentification(tokenString, users[Username], c) {
 		return
@@ -536,7 +535,6 @@ func importUsers() {
 
 func main() {
 
-	//fmt.Println("Hello, World!") // prints "Hello, World!"
 	router := gin.Default()
 
 	createDirectories()
@@ -546,7 +544,6 @@ func main() {
 		fmt.Println(user.Username)
 	}
 
-	// router.GET("/cars/:car", getCars)
 	router.GET("/:username/:doc_id", getDocs)
 	router.GET("/version", getVersion)
 	router.POST("/signup", signUp)

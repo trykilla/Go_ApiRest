@@ -1,30 +1,39 @@
 [
- {
-  "username": "user1",
-  "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
-  "token": "token",
-  "docsID": [
-   "lasaña",
-   "pasta",
-   "lasaña2"
-  ]
- },
- {
-  "username": "user2",
-  "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
-  "token": "token",
-  "docsID": [
-   "natillas",
-   "pisto",
-   "pisto"
-  ]
- },
- {
-  "username": "user3",
-  "password": "$2a$10$48LVKyxK5QlpaalG5zC2suzpcKDkQ.zbWlflA77eUhtCZ0nK7evtK",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
-  "docsID": [
-   "galletas"
-  ]
- }
+    {
+        "username": "user1",
+        "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
+        "token": "",
+        "docsID": [
+            "lasaña",
+            "pasta",
+            "lasaña2"
+        ]
+    },
+    {
+        "username": "user2",
+        "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
+        "token": "",
+        "docsID": [
+            "natillas",
+            "pisto",
+            "pisto"
+        ]
+    },
+    {
+        "username": "user3",
+        "password": "$2a$10$48LVKyxK5QlpaalG5zC2suzpcKDkQ.zbWlflA77eUhtCZ0nK7evtK",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
+        "docsID": [
+            "galletas"
+        ]
+    },
+    {
+        "username": "user4",
+        "password": "$2a$10$H34P5mAf6ZmCKisvafy8LeVOKqswt91Ni.5EaJ2cp9Eyd.XKBrfd6",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2MDk4MDIsInVzZXJuYW1lIjoidXNlcjQifQ.qN9O2tgOAHjwSG9zuTMHzFzpz4o2S0u6BboGSSIP4DQ",
+        "docsID": [
+            "pisto",
+            "pistos"
+        ]
+    }
 ]
