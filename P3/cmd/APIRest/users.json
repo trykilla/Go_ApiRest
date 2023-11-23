@@ -5,8 +5,7 @@
         "token": "",
         "docsID": [
             "lasaña",
-            "pasta",
-            "lasaña2"
+            "pasta"
         ]
     },
     {
@@ -15,7 +14,6 @@
         "token": "",
         "docsID": [
             "natillas",
-            "pisto",
             "pisto"
         ]
     },
@@ -25,15 +23,6 @@
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
         "docsID": [
             "galletas"
-        ]
-    },
-    {
-        "username": "user4",
-        "password": "$2a$10$H34P5mAf6ZmCKisvafy8LeVOKqswt91Ni.5EaJ2cp9Eyd.XKBrfd6",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA2MDk4MDIsInVzZXJuYW1lIjoidXNlcjQifQ.qN9O2tgOAHjwSG9zuTMHzFzpz4o2S0u6BboGSSIP4DQ",
-        "docsID": [
-            "pisto",
-            "pistos"
         ]
     }
 ]

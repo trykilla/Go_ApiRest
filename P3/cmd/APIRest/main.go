@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"strings"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 )
 
 type User struct {
@@ -23,11 +23,13 @@ type User struct {
 var users = make(map[string]User)
 var userDocs []map[string]string
 
+// crear una variable userDocs que sea una lista para ir añadiendo strings
+
 func createToken(username string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
-		"exp":      time.Now().Add(120 * time.Second).Unix(),
+		"exp":      time.Now().Add(5 * time.Minute).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
@@ -37,7 +39,7 @@ func createToken(username string) (string, error) {
 	}
 
 	return tokenString, nil
-  
+
 }
 
 func checkExp(c *gin.Context, userToken string, expired *bool) {
@@ -141,7 +143,7 @@ func validateToken(tokenString string) (*jwt.Token, error) {
 func openFile(username string, doc_id string) {
 
 	jsonFile := "./cmd/APIRest/docs/" + username + "/" + doc_id + ".json"
-	
+
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		fmt.Println(err)
@@ -162,7 +164,7 @@ func openFile(username string, doc_id string) {
 		fmt.Println(err)
 		return
 	}
-	
+
 }
 
 func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *int) {
@@ -193,6 +195,7 @@ func signUp(c *gin.Context) {
 
 	var user User
 	c.BindJSON(&user)
+	
 
 	if _, exists := users[user.Username]; exists {
 		c.JSON(http.StatusConflict, gin.H{"error": "User already exists."})
@@ -212,8 +215,10 @@ func signUp(c *gin.Context) {
 		return
 	}
 
-	fmt.Print(tokenString)
+	// fmt.Print(tokenString)
 
+	
+	
 	user.Password = string(hashedPassword)
 	user.Token = tokenString
 	user.DocsID = make([]string, 0)
@@ -261,7 +266,6 @@ func login(c *gin.Context) {
 
 func authentification(tokenString string, user User, c *gin.Context) bool {
 
-	
 	if user.Token == "token" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not logged in."})
 		return false
@@ -501,6 +505,39 @@ func createDirectories() {
 
 }
 
+func getAllDocsFromUser(c *gin.Context) {
+
+	allDocs := make(map[string]map[string]interface{})
+
+	tokenString := c.GetHeader("Authorization")
+	Username := c.Param("username")
+
+	if !authentification(tokenString, users[Username], c) {
+		return
+	}
+
+	for _, str := range users[Username].DocsID {
+
+		openFile(Username, str)
+
+		for _, i := range userDocs {
+			docInterface := make(map[string]interface{})
+
+			for key, value := range i {
+				
+				docInterface[key] = value
+			}
+			allDocs[str] = docInterface
+			
+		}
+		userDocs = nil
+
+	}
+
+	c.JSON(http.StatusOK, allDocs)
+
+}
+
 func readUsersFromFile() (users []User) {
 	jsonFile := "./cmd/APIRest/users.json"
 
@@ -551,6 +588,7 @@ func main() {
 	router.POST("/:username/:doc_id", postDocs)
 	router.PUT("/:username/:doc_id", putDocs)
 	router.DELETE("/:username/:doc_id", deleteDocs)
+	router.GET("/:username/_all_docs", getAllDocsFromUser)
 
 	err := http.ListenAndServeTLS("myserver.local:5000", "certificates/myserver.local.pem", "certificates/myserver.local-key.pem", router)
 	if err != nil {
