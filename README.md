@@ -1,11 +1,13 @@
-# Go REST API
+# Go REST API with Gin and JWT
 
-This project implements a Go-based REST API for managing users and associated documents. It utilizes the Gin framework for handling routes and HTTP requests. The application supports user authentication, user creation, fetching API version information, retrieving documents associated with users, and creating new documents.
+This project implements a Go-based REST API for user management and document handling using the Gin framework. It includes user authentication, user creation, document retrieval, creation, update, and deletion.
 
 ## Project Structure
 
-- **main.go**: Contains the main logic of the application, including route configuration and HTTP request handling.
-- **docs/**: Directory storing documents associated with users.
+- **main.go**: Main logic for route configuration and HTTP request handling.
+- **docs/**: Directory storing user-associated documents.
+- **users.json**: JSON file storing user credentials.
+- **run.sh**: Bash script for running the application. 
 
 ## Dependencies
 
@@ -18,6 +20,7 @@ This project implements a Go-based REST API for managing users and associated do
 1. **Get API Version**
    - Method: `GET`
    - Path: `/version`
+   Returns the API version.
 
 2. **Sign Up New User**
    - Method: `POST`
@@ -29,6 +32,8 @@ This project implements a Go-based REST API for managing users and associated do
        "password": "newPassword"
      }
      ```
+     Post a new user with the given username and password. The password will be hashed and stored in the `users.json` file.
+     Returns a JWT token for the new user.
 
 3. **Log In**
    - Method: `POST`
@@ -40,45 +45,47 @@ This project implements a Go-based REST API for managing users and associated do
        "password": "existingPassword"
      }
      ```
+      Returns a JWT token for the existing user.
    
+
 4. **Get Documents Associated with a User**
    - Method: `GET`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
+   Returns the raw content of the document with the given ID associated with the given user.
 
 5. **Add New Document**
    - Method: `POST`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
    - Request Body: Raw content of the document.
+   Creates a new document with the given ID associated with the given user.
 
 6. **Update Document**
    - Method: `PUT`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
    - Request Body: Raw content of the updated document.
+   Updates the document with the given ID associated with the given user.
 
 7. **Delete Document**
    - Method: `DELETE`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
+   Deletes the document with the given ID associated with the given user.
 
 ## Configuration and Execution
 
-1. **Install Dependencies:**
-   ```bash
-   go get -u github.com/gin-gonic/gin
-   go get -u golang.org/x/crypto/bcrypt
-   go get -u github.com/dgrijalva/jwt-go
-   ```
+**How to start the API?**
 
-2. **Run the Application:**
-   ```bash
-   go run main.go
-   ```
+The script must be executed from the root directory of the project, in this case: /P3
 
-The application will run on `myserver.local:5000`. Ensure that you have proper hostname resolution or modify the address and port as needed.
+```
+$ ./run.sh
+```
+
+The application will run on `myserver.local:5000`. Ensure proper hostname resolution or modify the address and port as needed. YOU MUST CHANGE /etc/hosts and change localhost to myserver.local: "127.0.0.1 myserver.local"
 
 ## Automated Tests
 
-Yet to be implemented.
+Testing is yet to be implemented.
