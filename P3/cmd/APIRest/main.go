@@ -1,16 +1,16 @@
 package main
 
 import (
-	"encoding/json"
+	"os"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"time"
+	"strings"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strings"
-	"time"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -195,7 +195,11 @@ func signUp(c *gin.Context) {
 
 	var user User
 	c.BindJSON(&user)
-	
+
+	if user.Username == "" || user.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request."})
+		return
+	}
 
 	if _, exists := users[user.Username]; exists {
 		c.JSON(http.StatusConflict, gin.H{"error": "User already exists."})
@@ -217,8 +221,6 @@ func signUp(c *gin.Context) {
 
 	// fmt.Print(tokenString)
 
-	
-	
 	user.Password = string(hashedPassword)
 	user.Token = tokenString
 	user.DocsID = make([]string, 0)
@@ -232,6 +234,12 @@ func signUp(c *gin.Context) {
 func login(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
+
+	
+	if user.Username == "" || user.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request or wrong format (must be {})."})
+		return
+	}
 
 	if _, exists := users[user.Username]; !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
@@ -266,8 +274,13 @@ func login(c *gin.Context) {
 
 func authentification(tokenString string, user User, c *gin.Context) bool {
 
-	if user.Token == "token" {
+	if user.Token == "token" || user.Token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not logged in."})
+		return false
+	}
+
+	if tokenString == "" || tokenString == "token" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not given."})
 		return false
 	}
 
@@ -294,8 +307,6 @@ func getDocs(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
-
-	//fmt.Println("User Token =", users[Username].Token)
 
 	if !authentification(tokenString, users[Username], c) {
 		return
@@ -419,6 +430,11 @@ func postDocs(c *gin.Context) {
 		return
 	}
 
+	if bodyContent[0] != '[' || bodyContent[len(bodyContent)-1] != ']' {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong format, must be [{}]."})
+		return
+	}
+
 	user := users[Username]
 	user.DocsID = append(user.DocsID, DocID)
 	users[Username] = user
@@ -524,11 +540,11 @@ func getAllDocsFromUser(c *gin.Context) {
 			docInterface := make(map[string]interface{})
 
 			for key, value := range i {
-				
+
 				docInterface[key] = value
 			}
 			allDocs[str] = docInterface
-			
+
 		}
 		userDocs = nil
 
