@@ -1,42 +1,23 @@
 [
- {
-  "username": "user1",
-  "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
-  "token": "",
-  "docsID": [
-   "lasaña",
-   "pasta",
-   "past",
-   "user"
-  ]
- },
- {
-  "username": "user2",
-  "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
-  "token": "",
-  "docsID": [
-   "natillas",
-   "pisto"
-  ]
- },
- {
-  "username": "user3",
-  "password": "$2a$10$48LVKyxK5QlpaalG5zC2suzpcKDkQ.zbWlflA77eUhtCZ0nK7evtK",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
-  "docsID": [
-   "galletas"
-  ]
- },
- {
-  "username": "",
-  "password": "$2a$10$AbhLRoNXifAsnU7LJPuGXOQu2TNR5TRNhbO9BdpBa63dzqm6XRXy.",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExMDcwNzksInVzZXJuYW1lIjoiIn0.jxrG9ZL8Rc3vEUhU6lJI_I1zXENI3FKTI87KjogCzGQ",
-  "docsID": []
- },
- {
-  "username": "user4",
-  "password": "$2a$10$XQyxfBoUoO6ad1iioGBOOumbAPff30Ua3a5cc9c7ddeZOwzI3cRl.",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExMDcyMDgsInVzZXJuYW1lIjoidXNlcjQifQ.OxFV9EgJLuwVcwN_j-E6nlyIZUrqnS17cUAWyM8lnu0",
-  "docsID": []
- }
+    {
+        "username": "user1",
+        "password": "$2a$10$u6bkw0Y/aUELcJrD.m6PN.qThSPVeDO3mcV3gljiz0fO93FbOlTUK",
+        "token": "",
+        "docsID": [
+            "natillas",
+            "perritos"
+        ]
+    },
+    {
+        "username": "user2",
+        "password": "$2a$10$8yshGkXozpz3hJddztlvCepP0q.PArzKg7XgkeFlvWZnhssOvMBma",
+        "token": "",
+        "docsID": []
+    },
+    {
+        "username": "user3",
+        "password": "$2a$10$48LVKyxK5QlpaalG5zC2suzpcKDkQ.zbWlflA77eUhtCZ0nK7evtK",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDAwNjcyNjcsInVzZXJuYW1lIjoidXNlcjMifQ.aTzbNR5qffq_AK0XaJhskTtPnNqv2wL4MB-eoeFUfj8",
+        "docsID": []
+    }
 ]

@@ -5,9 +5,9 @@ This project implements a Go-based REST API for user management and document han
 ## Project Structure
 
 - **main.go**: Main logic for route configuration and HTTP request handling.
-- **docs/**: Directory storing user-associated documents.
-- **users.json**: JSON file storing user credentials.
-- **run.sh**: Bash script for running the application. 
+- **cmd/APIRest/docs/**: Directory storing user-associated documents.
+- **cmd/APIRest/users.json**: JSON file storing user credentials.
+- **cmd/APIRest/run.sh**: Bash script for running the application.
 
 ## Dependencies
 
@@ -46,7 +46,6 @@ This project implements a Go-based REST API for user management and document han
      }
      ```
       Returns a JWT token for the existing user.
-   
 
 4. **Get Documents Associated with a User**
    - Method: `GET`
@@ -58,14 +57,24 @@ This project implements a Go-based REST API for user management and document han
    - Method: `POST`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
-   - Request Body: Raw content of the document.
+   - Request Body:
+   ```json
+     {
+       "doc_content": "This is the content of the document."
+     }
+     ```
    Creates a new document with the given ID associated with the given user.
 
 6. **Update Document**
    - Method: `PUT`
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
-   - Request Body: Raw content of the updated document.
+   - Request Body:
+   ```json
+     {
+       "doc_content": "This is the updated content of the document."
+     }
+     ```
    Updates the document with the given ID associated with the given user.
 
 7. **Delete Document**
@@ -78,13 +87,13 @@ This project implements a Go-based REST API for user management and document han
 
 **How to start the API?**
 
-The script must be executed from the root directory of the project, in this case: /P3
+The script must be executed from the root directory of the project, in this case:  `P3/`
 
-```
+```bash
 $ ./run.sh
 ```
 
-The application will run on `myserver.local:5000`. Ensure proper hostname resolution or modify the address and port as needed. YOU MUST CHANGE /etc/hosts and change localhost to myserver.local: "127.0.0.1 myserver.local"
+The application will run on `myserver.local:5000`. Ensure proper hostname resolution or modify the address and port as needed. YOU MUST CHANGE `/etc/hosts` and change localhost to myserver.local: "127.0.0.1 myserver.local"
 
 ## Automated Tests
 

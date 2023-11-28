@@ -13,6 +13,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// User struct
+
 type User struct {
 	Username string   `json:"username"`
 	Password string   `json:"password"`
@@ -21,10 +23,9 @@ type User struct {
 }
 
 var users = make(map[string]User)
-var userDocs []map[string]string
+var userDocs map[string]string
 
-// crear una variable userDocs que sea una lista para ir añadiendo strings
-
+// Creates a token with the username and an expiration time of 5 minutes
 func createToken(username string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -42,6 +43,7 @@ func createToken(username string) (string, error) {
 
 }
 
+// Checks if the token is valid and not expired
 func checkExp(c *gin.Context, userToken string, expired *bool) {
 
 	tokenString := c.GetHeader("Authorization")
@@ -50,8 +52,6 @@ func checkExp(c *gin.Context, userToken string, expired *bool) {
 		*expired = true
 		return
 	}
-
-	fmt.Println("Entering checkExp")
 
 	parts := strings.Split(tokenString, " ")
 	if len(parts) != 2 || parts[0] != "token" {
@@ -117,6 +117,8 @@ func checkExp(c *gin.Context, userToken string, expired *bool) {
 
 }
 
+// Validates the token
+
 func validateToken(tokenString string) (*jwt.Token, error) {
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -139,6 +141,8 @@ func validateToken(tokenString string) (*jwt.Token, error) {
 	return token, err
 
 }
+
+// Opens the file and unmarshalls it into the userDocs map
 
 func openFile(username string, doc_id string) {
 
@@ -167,10 +171,12 @@ func openFile(username string, doc_id string) {
 
 }
 
+// Writes the file with the given bodyContent
+
 func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *int) {
 
 	jsonFile := "./cmd/APIRest/docs/" + username + "/" + doc_id + ".json"
-	fmt.Println(jsonFile)
+
 	file, err := os.OpenFile(jsonFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Println(err)
@@ -187,10 +193,13 @@ func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *
 
 }
 
+// Get version of the code
+
 func getVersion(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"version": "0.0.1"})
 }
 
+// Sign up a new user
 func signUp(c *gin.Context) {
 
 	var user User
@@ -219,8 +228,6 @@ func signUp(c *gin.Context) {
 		return
 	}
 
-	// fmt.Print(tokenString)
-
 	user.Password = string(hashedPassword)
 	user.Token = tokenString
 	user.DocsID = make([]string, 0)
@@ -231,11 +238,11 @@ func signUp(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"access_token": tokenString})
 }
 
+// Login a user
 func login(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
 
-	
 	if user.Username == "" || user.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request or wrong format (must be {})."})
 		return
@@ -272,6 +279,7 @@ func login(c *gin.Context) {
 
 }
 
+// Checks if the token is valid and not expired, also some other checks
 func authentification(tokenString string, user User, c *gin.Context) bool {
 
 	if user.Token == "token" || user.Token == "" {
@@ -291,29 +299,28 @@ func authentification(tokenString string, user User, c *gin.Context) bool {
 	expired := false
 	checkExp(c, tokenString, &expired)
 
-	if expired {
-		return false
-	}
+	return !expired
 
-	if _, exists := users[user.Username]; !exists {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
-		return false
-	}
-	return true
 }
 
+// Get a doc from a user
 func getDocs(c *gin.Context) {
 
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 
+	if _, exists := users[Username]; !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		return
+	}
+
 	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
 	var doc string
-	fmt.Print(users[Username].DocsID)
+
 	for i, str := range users[Username].DocsID {
 		if str == DocID {
 			doc = users[Username].DocsID[i]
@@ -321,13 +328,9 @@ func getDocs(c *gin.Context) {
 		}
 	}
 
-	for _, i := range userDocs {
-
-		if value, ok := i[doc]; ok {
-			doc = value
-			break
-		}
-
+	if doc == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong id for this user, doc not found or removed."})
+		return
 	}
 
 	openFile(Username, doc)
@@ -342,6 +345,7 @@ func getDocs(c *gin.Context) {
 
 }
 
+// Inserts a new user in the users.json file
 func insertUser(user User) {
 
 	tempUsers := readUsersFromFile()
@@ -371,12 +375,18 @@ func insertUser(user User) {
 
 }
 
+// Updates the users.json file
 func putDocs(c *gin.Context) {
 
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 	flag := false
+
+	if _, exists := users[Username]; !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		return
+	}
 
 	for _, str := range users[Username].DocsID {
 		if str == DocID {
@@ -407,11 +417,17 @@ func putDocs(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"size": bytesWriten})
 }
 
+// Creates a new doc for a user
+
 func postDocs(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
-	fmt.Print(DocID)
+
+	if _, exists := users[Username]; !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		return
+	}
 
 	for _, str := range users[Username].DocsID {
 		if str == DocID {
@@ -430,18 +446,11 @@ func postDocs(c *gin.Context) {
 		return
 	}
 
-	if bodyContent[0] != '[' || bodyContent[len(bodyContent)-1] != ']' {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong format, must be [{}]."})
-		return
-	}
-
 	user := users[Username]
 	user.DocsID = append(user.DocsID, DocID)
 	users[Username] = user
 
 	var bytesWriten int
-
-	fmt.Print(users[Username].DocsID)
 
 	writeFile(Username, DocID, bodyContent, &bytesWriten)
 
@@ -451,12 +460,19 @@ func postDocs(c *gin.Context) {
 
 }
 
+// Deletes a doc from a user
+
 func deleteDocs(c *gin.Context) {
 
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
 	DocID := c.Param("doc_id")
 	flag := false
+
+	if _, exists := users[Username]; !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		return
+	}
 
 	if !authentification(tokenString, users[Username], c) {
 		return
@@ -484,6 +500,8 @@ func deleteDocs(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+// Inserts a doc in the users.json file
+
 func insertDocs(Username string, DocID string) {
 
 	tempUsers := readUsersFromFile()
@@ -510,6 +528,8 @@ func insertDocs(Username string, DocID string) {
 
 }
 
+// Creates the directories for the users and the docs
+
 func createDirectories() {
 	parentRoute := "./cmd/APIRest/docs"
 	err := os.MkdirAll(parentRoute, 0777)
@@ -521,39 +541,40 @@ func createDirectories() {
 
 }
 
+// Gets all the docs from a user
+
 func getAllDocsFromUser(c *gin.Context) {
 
-	allDocs := make(map[string]map[string]interface{})
+	allDocs := make(map[string]map[string]string)
 
 	tokenString := c.GetHeader("Authorization")
 	Username := c.Param("username")
+
+	if _, exists := users[Username]; !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		return
+	}
 
 	if !authentification(tokenString, users[Username], c) {
 		return
 	}
 
-	for _, str := range users[Username].DocsID {
-
-		openFile(Username, str)
-
-		for _, i := range userDocs {
-			docInterface := make(map[string]interface{})
-
-			for key, value := range i {
-
-				docInterface[key] = value
-			}
-			allDocs[str] = docInterface
-
-		}
+	for _, doc := range users[Username].DocsID {
+		openFile(Username, doc)
+		allDocs[doc] = userDocs
 		userDocs = nil
+	}
 
+	if len(allDocs) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This user has no docs."})
+		return
 	}
 
 	c.JSON(http.StatusOK, allDocs)
 
 }
 
+// Reads the users.json file and unmarshalls it into a slice of users
 func readUsersFromFile() (users []User) {
 	jsonFile := "./cmd/APIRest/users.json"
 
@@ -575,6 +596,7 @@ func readUsersFromFile() (users []User) {
 
 }
 
+// Imports the users from the users.json file
 func importUsers() {
 
 	tempUsers := readUsersFromFile()
@@ -586,10 +608,10 @@ func importUsers() {
 
 }
 
+// Main function
 func main() {
 
 	router := gin.Default()
-
 	createDirectories()
 	importUsers()
 	fmt.Println("Users in the system:")
