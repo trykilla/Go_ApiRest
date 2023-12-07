@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"strings"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 )
 
 // User struct
