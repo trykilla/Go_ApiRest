@@ -1,1 +1,8 @@
-[]
+[
+ {
+  "username": "user1",
+  "password": "$2a$10$Vi10ADCuF9nIEbdR9.OnFOltSXYmJU9RvuGitbgUhO/KquZockMHS",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDIzODQwMzQsInVzZXJuYW1lIjoidXNlcjEifQ.Zon03kf1rtPoGs24Dj_5Pl6VAz35f8SO5ax7G3QOT5E",
+  "docsID": []
+ }
+]

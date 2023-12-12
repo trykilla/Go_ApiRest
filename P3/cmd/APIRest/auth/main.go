@@ -1,17 +1,16 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"os"
-
-	"github.com/dgrijalva/jwt-go"
+	"fmt"
+	"time"
+	"strings"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"strings"
-	"time"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -105,7 +104,7 @@ func enviarInformacionAlBroker(user User) {
 
 
     // Realiza la solicitud POST al servicio broker
-    url := "http://127.0.0.1:8080/auth_rec"
+    url := "http://myserver.local:5000/auth_rec"
     _, err1 := http.Post(url, "application/json", strings.NewReader(string(userJSON)))
     if err1 != nil {
         fmt.Println("Error sending information to broker:", err)
@@ -164,6 +163,7 @@ func login(c *gin.Context) {
 
 	if _, exists := users[user.Username]; !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+		fmt.Println("User not found.")
 		return
 	}
 
@@ -214,5 +214,5 @@ func main() {
 	router.POST("/auth/signup", signUp)
 	router.POST("/auth/login", login)
 
-	router.Run(":8084")
+	router.Run("myserver.local:8084")
 }
