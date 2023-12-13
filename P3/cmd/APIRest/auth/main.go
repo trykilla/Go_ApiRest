@@ -113,7 +113,7 @@ func enviarInformacionAlBroker(user User) {
 }
 
 func signUp(c *gin.Context) {
-
+	importUsers()
 	var user User
 	c.BindJSON(&user)
 
@@ -153,6 +153,7 @@ func signUp(c *gin.Context) {
 }
 
 func login(c *gin.Context) {
+	importUsers()
 	var user User
 	c.BindJSON(&user)
 
@@ -190,6 +191,7 @@ func login(c *gin.Context) {
 	users[user.Username] = user
 
 	enviarInformacionAlBroker(user)
+	fmt.Println(users)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"access_token": tokenString})
 

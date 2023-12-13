@@ -1,14 +1,15 @@
 package main
 
 import (
+	"io/ioutil"
+
 	"github.com/gin-gonic/gin"
 
-	"io"
-	"fmt"
-	"strings"
-	"net/http"
 	"encoding/json"
-
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
 )
 
 const (
@@ -70,6 +71,7 @@ func redirectToService(c *gin.Context, targetURL string, variables map[string]st
 }
 
 func handleBrokerRoute(c *gin.Context) {
+	
 	serviceName := determineService(c)
 
 	switch serviceName {
@@ -77,6 +79,7 @@ func handleBrokerRoute(c *gin.Context) {
 
 		redirectToService(c, authServiceURL, nil)
 	case "files":
+		
 		username := c.Param("username")
 
 		user, ok := users[username]
@@ -90,11 +93,12 @@ func handleBrokerRoute(c *gin.Context) {
 
 		variables := map[string]string{
 			"username": user.Username,
+			"password": user.Password,
 			"doc_id":   c.Param("doc_id"),
 			"token":    user.Token,
 			"docsID":   docsIDString,
 		}
-
+		// importUsers()
 		redirectToService(c, filesServiceURL, variables)
 	default:
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Service not found"})
@@ -110,6 +114,7 @@ func determineService(c *gin.Context) string {
 }
 
 func main() {
+	importUsers()
 	router := gin.Default()
 
 	router.GET("/version", func(c *gin.Context) {
@@ -117,8 +122,11 @@ func main() {
 	})
 	router.POST("/:username/:doc_id", handleBrokerRoute)
 	router.POST("/login", handleBrokerRoute)
-	// router.POST("/signup", reverseProxy(authServiceURL))
-	// router.POST("/:username/:doc_id", reverseProxy(filesServiceURL))
+	router.POST("/signup", handleBrokerRoute)
+	router.GET("/:username/:doc_id", handleBrokerRoute)
+	router.GET("/:username/_all_docs", handleBrokerRoute)
+	router.PUT("/:username/:doc_id", handleBrokerRoute)
+	router.DELETE("/:username/:doc_id", handleBrokerRoute)
 	router.POST("/auth_rec", manageAuthRec)
 
 	// esperar 1 minut
@@ -144,28 +152,36 @@ func manageAuthRec(c *gin.Context) {
 
 }
 
-// func reverseProxy(targetURL string) gin.HandlerFunc {
+func importUsers() {
 
-// 	target, err := url.Parse(targetURL)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	tempUsers := readUsersFromFile()
+	for _, user := range tempUsers {
 
-// 	proxy := httputil.NewSingleHostReverseProxy(target)
+		users[user.Username] = user
 
-// 	return func(c *gin.Context) {
+	}
 
-// 		usersCopy := make(map[string]User)
-// 		for k, v := range users {
-// 			usersCopy[k] = v
-// 		}
+}
 
-// 		ctx := context.WithValue(c.Request.Context(), "users", usersCopy)
-// 		req := c.Request.WithContext(ctx)
-// 		c.Request = req
+func readUsersFromFile() (users []User) {
+	jsonFile := "./cmd/APIRest/users.json"
 
-// 		proxy.ServeHTTP(c.Writer, c.Request)
+	file, err := ioutil.ReadFile(jsonFile)
+	if err != nil {
+		fmt.Println("Error reading the users file", err)
+		return
+	}
 
-// 	}
+	var tempUsers []User
+	err = json.Unmarshal(file, &tempUsers)
+	if err != nil {
 
-// }
+		fmt.Println("Error unmarshalling the users file", err)
+		return
+	}
+
+	return tempUsers
+
+}
+
+
