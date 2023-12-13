@@ -14,10 +14,14 @@ go get -u github.com/dgrijalva/jwt-go
 
 # 3. Build the Application
 echo "Building the Go REST API..."
-go build ./cmd/APIRest
+go build ./cmd/APIRest/broker
+go build ./cmd/APIRest/auth
+go build ./cmd/APIRest/files
 
 # 4. Run the Application
 echo "Running Go REST API..."
-./APIRest
+gnome-terminal --title="Broker Service" -- bash -c "./broker; exec bash"
+gnome-terminal --title="Auth Service" -- bash -c "./auth" &
+gnome-terminal --title="Files Service" -- bash -c "./files" &
 
 # End of script

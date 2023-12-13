@@ -3,18 +3,18 @@ package main
 import (
 	"io/ioutil"
 
-	"github.com/gin-gonic/gin"
-
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"strings"
 )
 
 const (
-	authServiceURL  = "http://myserver.local:8084/auth"
-	filesServiceURL = "http://myserver.local:8082/files"
+	authServiceURL  = "https://myserver.local:8084/auth"
+	filesServiceURL = "https://myserver.local:8082/files"
 )
 
 type User struct {
@@ -71,7 +71,7 @@ func redirectToService(c *gin.Context, targetURL string, variables map[string]st
 }
 
 func handleBrokerRoute(c *gin.Context) {
-	
+
 	serviceName := determineService(c)
 
 	switch serviceName {
@@ -79,7 +79,7 @@ func handleBrokerRoute(c *gin.Context) {
 
 		redirectToService(c, authServiceURL, nil)
 	case "files":
-		
+
 		username := c.Param("username")
 
 		user, ok := users[username]
@@ -115,6 +115,7 @@ func determineService(c *gin.Context) string {
 
 func main() {
 	importUsers()
+	
 	router := gin.Default()
 
 	router.GET("/version", func(c *gin.Context) {
@@ -129,10 +130,14 @@ func main() {
 	router.DELETE("/:username/:doc_id", handleBrokerRoute)
 	router.POST("/auth_rec", manageAuthRec)
 
+	printColouredRoutes(router)
 	// esperar 1 minut
 
-	router.Run("myserver.local:5000")
-
+	err := http.ListenAndServeTLS("myserver.local:5000", "certificates/myserver.local.pem", "certificates/myserver.local-key.pem", router)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	//esperar un minuto
 
 }
@@ -184,4 +189,25 @@ func readUsersFromFile() (users []User) {
 
 }
 
+func printColouredRoutes(r *gin.Engine) {
+	fmt.Println("Routes:")
 
+	for _, route := range r.Routes() {
+		method := route.Method
+		path := route.Path
+
+		switch method {
+		case "GET":
+			color.Green("%s %s", method, path)
+		case "POST":
+			color.Blue("%s %s", method, path)
+		case "PUT":
+			color.Yellow("%s %s", method, path)
+		case "DELETE":
+			color.Red("%s %s", method, path)
+		default:
+			color.White("%s %s", method, path)
+		}
+	}
+	fmt.Println()
+}

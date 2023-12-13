@@ -31,11 +31,11 @@ func getDocs(c *gin.Context) {
 	docsId := c.Query("docsID")
 	userToken := c.Query("token")
 	userPass := c.Query("password")
-	fmt.Println("tokenString:", tokenString)
-	fmt.Println("Username:", Username)
-	fmt.Println("DocID:", DocID)
+	// fmt.Println("tokenString:", tokenString)
+	// fmt.Println("Username:", Username)
+	// fmt.Println("DocID:", DocID)
 
-	fmt.Println("docsId:", docsId)
+	// fmt.Println("docsId:", docsId)
 	docsIdSlice := strings.Split(docsId, ",")
 
 	user := User{
@@ -45,7 +45,7 @@ func getDocs(c *gin.Context) {
 		DocsID:   docsIdSlice,
 	}
 
-	fmt.Println("user:", user)
+	// fmt.Println("user:", user)
 
 	if !authentification(tokenString, user, c) {
 		return
@@ -85,11 +85,11 @@ func postDocs(c *gin.Context) {
 	docsId := c.Query("docsID")
 	userToken := c.Query("token")
 	userPass := c.Query("password")
-	fmt.Println("tokenString:", tokenString)
-	fmt.Println("Username:", Username)
-	fmt.Println("DocID:", DocID)
+	// fmt.Println("tokenString:", tokenString)
+	// fmt.Println("Username:", Username)
+	// fmt.Println("DocID:", DocID)
 
-	fmt.Println("docsId:", docsId)
+	// fmt.Println("docsId:", docsId)
 	docsIdSlice := strings.Split(docsId, ",")
 
 	for _, docId := range docsIdSlice {
@@ -343,7 +343,7 @@ func enviarInformacionAlBroker(user User) {
 	}
 
 	// Realiza la solicitud POST al servicio broker
-	url := "http://myserver.local:5000/auth_rec"
+	url := "https://myserver.local:5000/auth_rec"
 	_, err1 := http.Post(url, "application/json", strings.NewReader(string(userJSON)))
 	if err1 != nil {
 		fmt.Println("Error sending information to broker:", err)
@@ -574,5 +574,9 @@ func main() {
 	router.PUT("/files/:username/:doc_id", putDocs)
 	router.GET("/files/:username/:doc_id", getDocs)
 	router.GET("/files/:username/_all_docs", getAllDocsFromUser)
-	router.Run("myserver.local:8082")
+	err := http.ListenAndServeTLS("myserver.local:8082", "certificates/files.pem", "certificates/files-key.pem", router)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
