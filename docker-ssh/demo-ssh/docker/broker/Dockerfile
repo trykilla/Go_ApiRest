@@ -4,5 +4,10 @@ WORKDIR /app
 
 COPY broker /app/
 COPY certificates /app/certificates
+COPY users.json /app/cmd/APIRest/
 
-CMD ["./broker"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+
+CMD ["./entrypoint.sh"]

@@ -23,5 +23,5 @@ rsyslogd
 if [ -z "$@" ]; then
     exec /bin/bash
 else
-    exec $@
+    exec "$@"
 fi
