@@ -26,7 +26,7 @@ iptables -A FORWARD -i eth1 -o eth2 -p tcp --sport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -i eth2 -s 10.0.3.3 -j ACCEPT
 
 service ssh start
-rsyslogd
+service rsyslog start
 
 if [ -z "$@" ]; then
     exec /bin/bash

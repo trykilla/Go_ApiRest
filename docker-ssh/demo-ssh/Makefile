@@ -12,11 +12,6 @@ containers: build network
 		--name work --hostname work --ip 10.0.3.3 --network dev \
 		midebian-work
 
-	docker run --privileged --rm -ti -d \
-		--name auth --hostname auth --ip 10.0.2.3 --network srv \
-		midebian
-
-
 build:
 	docker build --rm -f docker/Dockerfile --tag midebian docker/
 	docker build --rm -f docker/router/Dockerfile --tag midebian-router docker/router
@@ -26,7 +21,6 @@ build:
 network:
 	-docker network create -d bridge --subnet 10.0.1.0/24 dmz
 	-docker network create -d bridge --subnet 10.0.3.0/24 dev
-	-docker network create -d bridge --subnet 10.0.2.0/24 srv
 
 remove:
 	-docker stop router work jump

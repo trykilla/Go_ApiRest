@@ -18,7 +18,7 @@ echo -e "Match Address 10.0.1.2\n  AllowUsers jump\n" >> /etc/ssh/sshd_config
 echo -e "Match Address 10.0.3.3\n  AllowUsers op\n" >> /etc/ssh/sshd_config
 
 service ssh start
-rsyslogd
+service rsyslog start
 
 if [ -z "$@" ]; then
     exec /bin/bash

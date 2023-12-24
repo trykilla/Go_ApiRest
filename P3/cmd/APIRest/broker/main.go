@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	authServiceURL  = "https://myserver.local:8084/auth"
+	authServiceURL  = "https://10.0.2.3:8084/auth"
 	filesServiceURL = "https://myserver.local:8082/files"
 )
 
@@ -133,7 +133,7 @@ func main() {
 	printColouredRoutes(router)
 	// esperar 1 minut
 
-	err := http.ListenAndServeTLS("172.17.0.2:5000", "certificates/myserver.local.pem", "certificates/myserver.local-key.pem", router)
+	err := http.ListenAndServeTLS("myserver.local:5000", "certificates/myserver.local.pem", "certificates/myserver.local-key.pem", router)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -13,6 +13,7 @@ RUN apt-get update && \
 	rsyslog \
 	curl \
 	sudo \
+	orphan-sysvinit-scripts \
 	&& \
     apt-get clean
 
