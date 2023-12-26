@@ -216,7 +216,7 @@ func main() {
 	router.POST("/auth/signup", signUp)
 	router.POST("/auth/login", login)
 
-	err := http.ListenAndServeTLS("10.0.2.3:8084", "certificates/auth.pem", "certificates/auth-key.pem", router)
+	err := http.ListenAndServeTLS("10.0.1.3:8084", "certificates/auth.pem", "certificates/auth-key.pem", router)
 	if err != nil {
 		fmt.Println(err)
 		return

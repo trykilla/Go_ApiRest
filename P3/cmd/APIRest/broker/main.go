@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	authServiceURL  = "https://10.0.2.3:8084/auth"
+	authServiceURL  = "https://10.0.1.3:8084/auth"
 	filesServiceURL = "https://myserver.local:8082/files"
 )
 

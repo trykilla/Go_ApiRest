@@ -7,6 +7,7 @@ containers: build network
 
 	docker run --privileged --rm -ti -d \
 		--name jump --hostname jump --ip 10.0.1.3 --network dmz midebian-jump
+	
 
 	docker run --privileged --rm -ti -d \
 		--name work --hostname work --ip 10.0.3.3 --network dev \
