@@ -1,19 +1,22 @@
 package main
 
 import (
+	"crypto/tls"
 	"io/ioutil"
+	"os"
 
 	"encoding/json"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/gin-gonic/gin"
 )
 
 const (
-	authServiceURL  = "https://10.0.1.3:8084/auth"
+	authServiceURL  = "https://10.0.2.3:8084/auth"
 	filesServiceURL = "https://myserver.local:8082/files"
 )
 
@@ -43,6 +46,10 @@ func redirectToService(c *gin.Context, targetURL string, variables map[string]st
 			queryParams.Add(k, v)
 		}
 		newRequest.URL.RawQuery = queryParams.Encode()
+	}
+
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
 	response, err := client.Do(newRequest)
@@ -115,7 +122,7 @@ func determineService(c *gin.Context) string {
 
 func main() {
 	importUsers()
-	
+
 	router := gin.Default()
 
 	router.GET("/version", func(c *gin.Context) {
@@ -151,7 +158,9 @@ func manageAuthRec(c *gin.Context) {
 		return
 	}
 
+	
 	users[user.Username] = user
+	insertUser(user)
 
 	fmt.Println("Received information from auth service:", users)
 
@@ -164,6 +173,33 @@ func importUsers() {
 
 		users[user.Username] = user
 
+	}
+
+}
+
+func insertUser(user User) {
+
+	
+
+	updateJsonFile, err := json.MarshalIndent(users, "", " ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = ioutil.WriteFile("cmd/APIRest/users.json", updateJsonFile, 0644)
+	if err != nil {
+
+		fmt.Println(err)
+		return
+	}
+
+	parentRoute := "./cmd/APIRest/docs/" + user.Username + "/"
+	route_err := os.MkdirAll(parentRoute, 0777)
+
+	if route_err != nil {
+		fmt.Println("Error creating directory", err)
+		return
 	}
 
 }

@@ -1,16 +1,18 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"strings"
-	"net/http"
-	"io/ioutil"
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -21,8 +23,6 @@ type User struct {
 }
 
 var users = make(map[string]User)
-
-
 
 func createToken(username string) (string, error) {
 
@@ -102,14 +102,19 @@ func enviarInformacionAlBroker(user User) {
 		return
 	}
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 
-    // Realiza la solicitud POST al servicio broker
-    url := "https://myserver.local:5000/auth_rec"
-    _, err1 := http.Post(url, "application/json", strings.NewReader(string(userJSON)))
-    if err1 != nil {
-        fmt.Println("Error sending information to broker:", err)
-        return
-    }
+	client := &http.Client{Transport: tr}
+
+	// Realiza la solicitud POST al servicio broker
+	url := "https://myserver.local:5000/auth_rec"
+	_, err1 := client.Post(url, "application/json", strings.NewReader(string(userJSON)))
+	if err1 != nil {
+		fmt.Println("Error sending information to broker:", err)
+		return
+	}
 }
 
 func signUp(c *gin.Context) {
@@ -216,7 +221,7 @@ func main() {
 	router.POST("/auth/signup", signUp)
 	router.POST("/auth/login", login)
 
-	err := http.ListenAndServeTLS("10.0.1.3:8084", "certificates/auth.pem", "certificates/auth-key.pem", router)
+	err := http.ListenAndServeTLS("10.0.2.3:8084", "certificates/auth.pem", "certificates/auth-key.pem", router)
 	if err != nil {
 		fmt.Println(err)
 		return

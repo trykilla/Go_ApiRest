@@ -4,6 +4,8 @@
 
 echo "10.0.1.4 myserver.local" >> /etc/hosts
 
+ip route del default
+ip route add default via 10.0.1.2 dev eth0
 # Limpiar reglas existentes
 # iptables -F
 # iptables -P INPUT DROP

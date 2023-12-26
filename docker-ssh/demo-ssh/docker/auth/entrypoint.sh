@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Configuración de iptables para permitir la comunicación en la red srv
-
+ip route del default
+ip route add default via 10.0.2.2 dev eth0
 # Limpiar reglas existentes
 # iptables -F
 # iptables -P INPUT DROP

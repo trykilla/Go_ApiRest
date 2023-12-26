@@ -1,4 +1,4 @@
-FROM midebian:try
+FROM midebian
 
 WORKDIR /app
 
