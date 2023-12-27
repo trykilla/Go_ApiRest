@@ -17,7 +17,7 @@ import (
 
 const (
 	authServiceURL  = "https://10.0.2.3:8084/auth"
-	filesServiceURL = "https://myserver.local:8082/files"
+	filesServiceURL = "https://10.0.2.4:8082/files"
 )
 
 type User struct {
@@ -149,8 +149,35 @@ func main() {
 
 }
 
+func insertDocs(Username string, DocID string) {
+
+	tempUsers := readUsersFromFile()
+
+	for i, user := range tempUsers {
+		if user.Username == Username {
+			tempUsers[i].DocsID = append(tempUsers[i].DocsID, DocID)
+			break
+		}
+	}
+
+	updateJsonFile, err := json.MarshalIndent(tempUsers, "", " ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = ioutil.WriteFile("./cmd/APIRest/users.json", updateJsonFile, 0644)
+	if err != nil {
+
+		fmt.Println(err)
+		return
+	}
+
+}
+
 func manageAuthRec(c *gin.Context) {
 	var user User
+	flag := false
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -158,9 +185,33 @@ func manageAuthRec(c *gin.Context) {
 		return
 	}
 
-	
+	for _, us := range users {
+		if user.Username == users[us.Username].Username {
+			flag = true
+			fmt.Println("user docs ids:", user.DocsID)
+			if len(user.DocsID) == 2 {
+				insertDocs(user.Username, user.DocsID[1])
+			} else if len(user.DocsID) != 0 {
+
+				for i, doc := range users[us.Username].DocsID {
+					if doc == user.DocsID[i] {
+						fmt.Println("Doc already exists")
+						continue
+					} else {
+						insertDocs(user.Username, user.DocsID[i])
+						break
+					}
+				}
+			}
+		}
+	}
+
 	users[user.Username] = user
-	insertUser(user)
+
+	if !flag {
+		fmt.Println("User does not exist, inserting...")
+		insertUser(user)
+	}
 
 	fmt.Println("Received information from auth service:", users)
 
@@ -179,9 +230,11 @@ func importUsers() {
 
 func insertUser(user User) {
 
-	
+	tempUsers := readUsersFromFile()
 
-	updateJsonFile, err := json.MarshalIndent(users, "", " ")
+	tempUsers = append(tempUsers, user)
+
+	updateJsonFile, err := json.MarshalIndent(tempUsers, "", " ")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -198,7 +251,7 @@ func insertUser(user User) {
 	route_err := os.MkdirAll(parentRoute, 0777)
 
 	if route_err != nil {
-		fmt.Println("Error creating directory", err)
+		fmt.Println("Error creating directory", route_err)
 		return
 	}
 

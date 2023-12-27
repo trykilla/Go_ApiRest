@@ -21,6 +21,10 @@ containers: build network
 	--name auth --hostname auth --ip 10.0.2.3 --network srv \
 	auth
 
+	docker run --privileged --rm -ti -d \
+	--name files --hostname files --ip 10.0.2.4 --network srv \
+	files
+
 build:
 	docker build --rm -f docker/Dockerfile --tag midebian docker/
 	docker build --rm -f docker/router/Dockerfile --tag midebian-router docker/router
@@ -28,6 +32,8 @@ build:
 	docker build --rm -f docker/work/Dockerfile --tag midebian-work docker/work
 	docker build --rm -f docker/broker/Dockerfile --tag broker docker/broker
 	docker build --rm -f docker/auth/Dockerfile --tag auth docker/auth
+	docker build --rm -f docker/files/Dockerfile --tag files docker/files
+
 
 
 network:
@@ -36,7 +42,7 @@ network:
 	-docker network create -d bridge --subnet 10.0.3.0/24 dev
 
 remove:
-	-docker stop router work jump broker auth
+	-docker stop router work jump broker auth files
 	-docker network prune -f
 
 clean:

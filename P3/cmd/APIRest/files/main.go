@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -31,11 +32,7 @@ func getDocs(c *gin.Context) {
 	docsId := c.Query("docsID")
 	userToken := c.Query("token")
 	userPass := c.Query("password")
-	// fmt.Println("tokenString:", tokenString)
-	// fmt.Println("Username:", Username)
-	// fmt.Println("DocID:", DocID)
 
-	// fmt.Println("docsId:", docsId)
 	docsIdSlice := strings.Split(docsId, ",")
 
 	user := User{
@@ -45,7 +42,7 @@ func getDocs(c *gin.Context) {
 		DocsID:   docsIdSlice,
 	}
 
-	// fmt.Println("user:", user)
+	fmt.Println("user:", user)
 
 	if !authentification(tokenString, user, c) {
 		return
@@ -124,7 +121,11 @@ func postDocs(c *gin.Context) {
 
 	writeFile(Username, DocID, bodyContent, &bytesWriten)
 
-	insertDocs(Username, DocID)
+
+	fmt.Println("user after postin doc:", user)
+
+	//insertDocs(Username, DocID)
+
 
 	enviarInformacionAlBroker(user)
 
@@ -342,9 +343,15 @@ func enviarInformacionAlBroker(user User) {
 		return
 	}
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{Transport: tr}
+
 	// Realiza la solicitud POST al servicio broker
 	url := "https://myserver.local:5000/auth_rec"
-	_, err1 := http.Post(url, "application/json", strings.NewReader(string(userJSON)))
+	_, err1 := client.Post(url, "application/json", strings.NewReader(string(userJSON)))
 	if err1 != nil {
 		fmt.Println("Error sending information to broker:", err)
 		return
@@ -378,31 +385,35 @@ func openFile(username string, doc_id string) {
 
 }
 
-func insertDocs(Username string, DocID string) {
+// func insertDocs(Username string, DocID string) {
 
-	tempUsers := readUsersFromFile()
+// 	tempUsers := readUsersFromFile()
 
-	for i, user := range tempUsers {
-		if user.Username == Username {
-			tempUsers[i].DocsID = append(tempUsers[i].DocsID, DocID)
-			break
-		}
-	}
+// 	for i, user := range tempUsers {
+// 		if user.Username == Username {
+// 			tempUsers[i].DocsID = append(tempUsers[i].DocsID, DocID)
+// 			break
+// 		}
+// 	}
 
-	updateJsonFile, err := json.MarshalIndent(tempUsers, "", " ")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+// 	updateJsonFile, err := json.MarshalIndent(tempUsers, "", " ")
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
 
-	err = ioutil.WriteFile("./cmd/APIRest/users.json", updateJsonFile, 0644)
-	if err != nil {
+	
 
-		fmt.Println(err)
-		return
-	}
+// 	err = ioutil.WriteFile("./cmd/APIRest/users.json", updateJsonFile, 0644)
+// 	if err != nil {
 
-}
+// 		fmt.Println(err)
+// 		return
+// 	}
+
+// }
+
+
 
 func readUsersFromFile() (users []User) {
 	jsonFile := "./cmd/APIRest/users.json"
@@ -426,6 +437,14 @@ func readUsersFromFile() (users []User) {
 }
 
 func writeFile(username string, doc_id string, bodyContent []byte, bytesWriten *int) {
+
+	parentRoute := "./cmd/APIRest/docs/" + username + "/"
+	route_err := os.MkdirAll(parentRoute, 0777)
+
+	if route_err != nil {
+		fmt.Println("Error creating directory", route_err)
+		return
+	}
 
 	jsonFile := "./cmd/APIRest/docs/" + username + "/" + doc_id + ".json"
 
@@ -574,7 +593,7 @@ func main() {
 	router.PUT("/files/:username/:doc_id", putDocs)
 	router.GET("/files/:username/:doc_id", getDocs)
 	router.GET("/files/:username/_all_docs", getAllDocsFromUser)
-	err := http.ListenAndServeTLS("myserver.local:8082", "certificates/files.pem", "certificates/files-key.pem", router)
+	err := http.ListenAndServeTLS("10.0.2.4:8082", "certificates/files.pem", "certificates/files-key.pem", router)
 	if err != nil {
 		fmt.Println(err)
 		return
