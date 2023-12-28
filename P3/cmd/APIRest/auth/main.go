@@ -22,6 +22,11 @@ type User struct {
 	DocsID   []string `json:"docsID"`
 }
 
+const (
+	targetLogin = "https://myserver.local:5000/auth_rec_login"
+	targetSignUp = "https://myserver.local:5000/auth_rec_signup"
+)
+
 var users = make(map[string]User)
 
 func createToken(username string) (string, error) {
@@ -91,7 +96,7 @@ func readUsersFromFile() (users []User) {
 
 }
 
-func enviarInformacionAlBroker(user User) {
+func sendInfoToBroker(user User, target string) {
 	// Aquí implementa la lógica para enviar información al servicio broker
 	// Puedes utilizar bibliotecas como "net/http" para hacer una solicitud POST al servicio broker.
 
@@ -109,7 +114,7 @@ func enviarInformacionAlBroker(user User) {
 	client := &http.Client{Transport: tr}
 
 	// Realiza la solicitud POST al servicio broker
-	url := "https://myserver.local:5000/auth_rec"
+	url := target
 	_, err1 := client.Post(url, "application/json", strings.NewReader(string(userJSON)))
 	if err1 != nil {
 		fmt.Println("Error sending information to broker:", err)
@@ -152,7 +157,7 @@ func signUp(c *gin.Context) {
 
 	insertUser(user)
 
-	enviarInformacionAlBroker(user)
+	sendInfoToBroker(user, targetSignUp)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"access_token": tokenString})
 }
@@ -195,7 +200,7 @@ func login(c *gin.Context) {
 
 	users[user.Username] = user
 
-	enviarInformacionAlBroker(user)
+	sendInfoToBroker(user, targetLogin)
 	fmt.Println(users)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"access_token": tokenString})

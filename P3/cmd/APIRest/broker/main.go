@@ -135,7 +135,8 @@ func main() {
 	router.GET("/:username/_all_docs", handleBrokerRoute)
 	router.PUT("/:username/:doc_id", handleBrokerRoute)
 	router.DELETE("/:username/:doc_id", handleBrokerRoute)
-	router.POST("/auth_rec", manageAuthRec)
+	router.POST("/auth_rec_signup", manageAuthRecSignUp)
+	router.POST("/auth_rec_login", manageAuthRecLogin)
 	router.POST("/files_rec_post", manageFilesRecOnPost)
 	router.POST("/files_rec_delete", manageFilesRecOnDelete)
 
@@ -227,9 +228,9 @@ func manageFilesRecOnPost(c *gin.Context) {
 
 }
 
-func manageAuthRec(c *gin.Context) {
+func manageAuthRecSignUp(c *gin.Context) {
 	var user User
-	flag := false
+	// flag := false
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -237,27 +238,42 @@ func manageAuthRec(c *gin.Context) {
 		return
 	}
 
-	for _, us := range users {
-		if user.Username == users[us.Username].Username {
-			flag = true
-		}
-	}
+	// for _, us := range users {
+	// 	if user.Username == users[us.Username].Username {
+	// 		flag = true
+	// 	}
+	// }
 
-	if !flag {
-		fmt.Println("User does not exist, inserting...")
-		users[user.Username] = user
-		insertUser(user)
-	} else {
-		fmt.Println("User already exists, updating...")
-		if userVal, ok := users[user.Username]; ok {
-			userVal.Token = user.Token
-			users[user.Username] = userVal
-		}
-
-	}
-
+	fmt.Println("User does not exist, inserting...")
+	users[user.Username] = user
+	insertUser(user)
+	// } else {
+	// 	fmt.Println("User already exists, updating...")
+	// 	if userVal, ok := users[user.Username]; ok {
+	// 		userVal.Token = user.Token
+	// 		users[user.Username] = userVal
+	// 	}
 	fmt.Println("Received information from auth service:", users)
+}
 
+func manageAuthRecLogin(c *gin.Context) {
+	var user User
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println("Error receiving information from auth service:", err)
+		return
+	}
+
+	fmt.Println("Received information from auth service:", user)
+
+	if userVal, ok := users[user.Username]; ok {
+		userVal.Token = user.Token
+		users[user.Username] = userVal
+	}
+
+	fmt.Println("User exists, updating...")
+	
 }
 
 func importUsers() {
