@@ -136,6 +136,8 @@ func main() {
 	router.PUT("/:username/:doc_id", handleBrokerRoute)
 	router.DELETE("/:username/:doc_id", handleBrokerRoute)
 	router.POST("/auth_rec", manageAuthRec)
+	router.POST("/files_rec_post", manageFilesRecOnPost)
+	router.POST("/files_rec_delete", manageFilesRecOnDelete)
 
 	printColouredRoutes(router)
 	// esperar 1 minut
@@ -155,7 +157,7 @@ func insertDocs(Username string, DocID string) {
 
 	for i, user := range tempUsers {
 		if user.Username == Username {
-			tempUsers[i].DocsID = append(tempUsers[i].DocsID, DocID)
+			tempUsers[i] = users[Username]
 			break
 		}
 	}
@@ -175,6 +177,56 @@ func insertDocs(Username string, DocID string) {
 
 }
 
+func manageFilesRecOnDelete(c *gin.Context) {
+	var user User
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println("Error receiving information from files service:", err)
+		return
+	}
+
+	users[user.Username] = user
+
+	fmt.Println("Info received from files service:", user)
+
+	fmt.Println("User exists, deleting docs...")
+	if userVal, ok := users[user.Username]; ok {
+		userVal.DocsID = user.DocsID
+		users[user.Username] = userVal
+		for _, docID := range user.DocsID {
+			insertDocs(user.Username, docID)
+		}
+	}
+
+}
+
+func manageFilesRecOnPost(c *gin.Context) {
+	var user User
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println("Error receiving information from files service:", err)
+		return
+	}
+
+	fmt.Println("Info received from files service:", user)
+
+	users[user.Username] = user
+
+	if len(user.DocsID) == 1 {
+		fmt.Println("user docs ids:", user.DocsID)
+		insertDocs(user.Username, user.DocsID[0])
+	} else if len(user.DocsID) == 2 && user.DocsID[0] == "" {
+		fmt.Println("user docs ids:", user.DocsID)
+		insertDocs(user.Username, user.DocsID[1])
+	} else {
+		fmt.Println("user docid ids:", user.DocsID[len(user.DocsID)-1])
+		insertDocs(user.Username, user.DocsID[len(user.DocsID)-1])
+	}
+
+}
+
 func manageAuthRec(c *gin.Context) {
 	var user User
 	flag := false
@@ -188,29 +240,20 @@ func manageAuthRec(c *gin.Context) {
 	for _, us := range users {
 		if user.Username == users[us.Username].Username {
 			flag = true
-			fmt.Println("user docs ids:", user.DocsID)
-			if len(user.DocsID) == 2 {
-				insertDocs(user.Username, user.DocsID[1])
-			} else if len(user.DocsID) != 0 {
-
-				for i, doc := range users[us.Username].DocsID {
-					if doc == user.DocsID[i] {
-						fmt.Println("Doc already exists")
-						continue
-					} else {
-						insertDocs(user.Username, user.DocsID[i])
-						break
-					}
-				}
-			}
 		}
 	}
 
-	users[user.Username] = user
-
 	if !flag {
 		fmt.Println("User does not exist, inserting...")
+		users[user.Username] = user
 		insertUser(user)
+	} else {
+		fmt.Println("User already exists, updating...")
+		if userVal, ok := users[user.Username]; ok {
+			userVal.Token = user.Token
+			users[user.Username] = userVal
+		}
+
 	}
 
 	fmt.Println("Received information from auth service:", users)

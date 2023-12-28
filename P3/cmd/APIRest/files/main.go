@@ -22,6 +22,11 @@ type User struct {
 	DocsID   []string `json:"docsID"`
 }
 
+const (
+	urlPost = "https://myserver.local:5000/files_rec_post"
+	urlDelete = "https://myserver.local:5000/files_rec_delete"	
+)
+
 var userDocs map[string]string
 
 func getDocs(c *gin.Context) {
@@ -115,19 +120,19 @@ func postDocs(c *gin.Context) {
 		return
 	}
 
-	user.DocsID = append(user.DocsID, DocID)
+	cleanedDocID := strings.TrimSpace(DocID)
+
+	user.DocsID = append(user.DocsID, cleanedDocID)
 
 	var bytesWriten int
 
-	writeFile(Username, DocID, bodyContent, &bytesWriten)
-
+	writeFile(Username, cleanedDocID, bodyContent, &bytesWriten)
 
 	fmt.Println("user after postin doc:", user)
 
 	//insertDocs(Username, DocID)
 
-
-	enviarInformacionAlBroker(user)
+	sendInfoToBroker(user, urlPost)
 
 	c.JSON(http.StatusOK, gin.H{"size": bytesWriten})
 
@@ -240,7 +245,7 @@ func deleteDocs(c *gin.Context) {
 
 	overWriteUser(user)
 
-	enviarInformacionAlBroker(user)
+	sendInfoToBroker(user, urlDelete)
 
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -332,7 +337,7 @@ func overWriteUser(user User) {
 
 }
 
-func enviarInformacionAlBroker(user User) {
+func sendInfoToBroker(user User, targetUrl string) {
 	// Aquí implementa la lógica para enviar información al servicio broker
 	// Puedes utilizar bibliotecas como "net/http" para hacer una solicitud POST al servicio broker.
 
@@ -350,7 +355,7 @@ func enviarInformacionAlBroker(user User) {
 	client := &http.Client{Transport: tr}
 
 	// Realiza la solicitud POST al servicio broker
-	url := "https://myserver.local:5000/auth_rec"
+	url := targetUrl
 	_, err1 := client.Post(url, "application/json", strings.NewReader(string(userJSON)))
 	if err1 != nil {
 		fmt.Println("Error sending information to broker:", err)
@@ -402,8 +407,6 @@ func openFile(username string, doc_id string) {
 // 		return
 // 	}
 
-	
-
 // 	err = ioutil.WriteFile("./cmd/APIRest/users.json", updateJsonFile, 0644)
 // 	if err != nil {
 
@@ -412,8 +415,6 @@ func openFile(username string, doc_id string) {
 // 	}
 
 // }
-
-
 
 func readUsersFromFile() (users []User) {
 	jsonFile := "./cmd/APIRest/users.json"
