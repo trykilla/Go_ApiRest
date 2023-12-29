@@ -7,6 +7,16 @@ iptables -P OUTPUT ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -p icmp -j ACCEPT
 
+# Permitir respuestas DNS
+iptables -A INPUT -i eth0 -p udp --sport 53 -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 53 -j ACCEPT
+
+# Permitir respuestas HTTP
+iptables -A INPUT -i eth0 -p tcp --sport 80 -j ACCEPT
+
+# Permitir respuestas HTTPS
+iptables -A INPUT -i eth0 -p tcp --sport 443 -j ACCEPT
+
 iptables -A INPUT -p tcp --dport 22 -s 10.0.1.2 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -s 10.0.3.3 -j ACCEPT
 iptables -A INPUT -p tcp --sport 22 -s 10.0.3.0/24 -j ACCEPT

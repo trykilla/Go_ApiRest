@@ -28,8 +28,10 @@ ip route add default via 10.0.2.2 dev eth0
 
 # Ejecutar el comando proporcionado o iniciar el shell si no se proporciona ningún comando
 # Ejecutar el comando proporcionado o iniciar el shell si no se proporciona ningún comando
-if [ -z "$1" ]; then
-    exec /bin/bash
-else
-    exec "$@"
-fi
+
+./auth
+# if [ -z "$1" ]; then
+#     exec /bin/bash
+# else
+#     exec "$@"
+# fi

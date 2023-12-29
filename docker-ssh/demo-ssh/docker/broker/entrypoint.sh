@@ -6,37 +6,40 @@ echo "10.0.1.4 myserver.local" >> /etc/hosts
 
 ip route del default
 ip route add default via 10.0.1.2 dev eth0
+
 # Limpiar reglas existentes
-# iptables -F
-# iptables -P INPUT DROP
-# iptables -P FORWARD DROP
-# iptables -P OUTPUT ACCEPT
+iptables -F
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
 
-# # Permitir tráfico en interfaz loopback
-# iptables -A INPUT -i lo -j ACCEPT
-# iptables -A OUTPUT -o lo -j ACCEPT
+# Permitir tráfico proveniente del router (reemplaza x.x.x.x con la IP del router)
+iptables -A INPUT -i eth0 -s 10.0.1.2 -j ACCEPT
 
-# # Permitir ping
-# iptables -A INPUT -p icmp -j ACCEPT
-# iptables -A OUTPUT -p icmp -j ACCEPT
+# Permitir tráfico en el puerto 5000
+iptables -A INPUT -i eth0 -s 10.0.1.2 -p tcp --sport 5000 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.1.2 -p tcp --dport 5000 -j ACCEPT
 
+# Permitir respuestas DNS
+iptables -A INPUT -i eth0 -p udp --sport 53 -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 53 -j ACCEPT
 
+# Permitir respuestas HTTP
+iptables -A INPUT -i eth0 -p tcp --sport 80 -j ACCEPT
 
-# # Permitir comunicación con otros contenedores en la red srv
-# iptables -A INPUT -s 10.0.2.0/24 -j ACCEPT
-# iptables -A OUTPUT -d 10.0.2.0/24 -j ACCEPT
+# Permitir respuestas HTTPS
+iptables -A INPUT -i eth0 -p tcp --sport 443 -j ACCEPT
 
-# iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT
-# iptables -A OUTPUT -d 192.168.1.0/24 -j ACCEPT
+# Permitir tráfico en interfaz loopback
+iptables -A INPUT -i lo -j ACCEPT
 
-# # Configurar reenvío de paquetes entre interfaces
-# sysctl -w net.ipv4.ip_forward=1
+# Permitir ping
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+
+sysctl -w net.ipv4.ip_forward=1
 
 # Iniciar tu aplicación o servicios aquí
 
 # Ejecutar el comando proporcionado o iniciar el shell si no se proporciona ningún comando
-if [ -z "$1" ]; then
-    exec /bin/bash
-else
-    exec "$@"
-fi
+./broker
