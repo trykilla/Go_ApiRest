@@ -1,7 +1,7 @@
 .PHONY: build network container remove clean
 
 containers: build network
-	docker run --privileged --rm -ti -d --name router --hostname router midebian-router
+	docker run --privileged -p 5000:5000 --rm -ti -d --name router --hostname router midebian-router
 	docker network connect dmz router
 	docker network connect dev router
 	docker network connect srv router

@@ -15,10 +15,18 @@ iptables -P OUTPUT ACCEPT
 
 # Permitir tráfico proveniente del router (reemplaza x.x.x.x con la IP del router)
 iptables -A INPUT -i eth0 -s 10.0.1.2 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.3 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.4 -j ACCEPT
+
 
 # Permitir tráfico en el puerto 5000
 iptables -A INPUT -i eth0 -s 10.0.1.2 -p tcp --sport 5000 -j ACCEPT
 iptables -A INPUT -i eth0 -s 10.0.1.2 -p tcp --dport 5000 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.3 -p tcp --sport 5000 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.4 -p tcp --sport 5000 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.3 -p tcp --dport 5000 -j ACCEPT
+iptables -A INPUT -i eth0 -s 10.0.2.4 -p tcp --dport 5000 -j ACCEPT
+
 
 # Permitir respuestas DNS
 iptables -A INPUT -i eth0 -p udp --sport 53 -j ACCEPT
@@ -29,7 +37,7 @@ iptables -A INPUT -i eth0 -p tcp --sport 80 -j ACCEPT
 
 # Permitir respuestas HTTPS
 iptables -A INPUT -i eth0 -p tcp --sport 443 -j ACCEPT
-
+iptables -A OUTPUT -i eth0 -p tcp --dport 443 -j ACCEPT
 # Permitir tráfico en interfaz loopback
 iptables -A INPUT -i lo -j ACCEPT
 
