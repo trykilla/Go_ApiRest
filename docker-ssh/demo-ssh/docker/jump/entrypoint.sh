@@ -25,7 +25,7 @@ ip route del default
 ip route add default via 10.0.1.2 dev eth0
 
 # shellcheck disable=SC2129
-sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+
 echo -e "Match Address 10.0.1.2\n  AllowUsers jump\n" >> /etc/ssh/sshd_config
 echo -e "Match Address 10.0.3.3\n  AllowUsers op\n" >> /etc/ssh/sshd_config
 
