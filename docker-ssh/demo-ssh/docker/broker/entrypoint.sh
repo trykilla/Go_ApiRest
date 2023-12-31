@@ -47,7 +47,15 @@ iptables -A OUTPUT -p icmp -j ACCEPT
 
 sysctl -w net.ipv4.ip_forward=1
 
+service ssh start
+service rsyslog start
+
 # Iniciar tu aplicación o servicios aquí
 
 # Ejecutar el comando proporcionado o iniciar el shell si no se proporciona ningún comando
 ./broker
+# if [ $# -eq 0 ]; then
+#     /bin/bash
+# else
+#     exec "$@"
+# fi

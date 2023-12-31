@@ -23,8 +23,8 @@ type User struct {
 }
 
 const (
-	targetLogin = "https://myserver.local:5000/auth_rec_login"
-	targetSignUp = "https://myserver.local:5000/auth_rec_signup"
+	targetLogin = "https://10.0.1.4:5000/auth_rec_login"
+	targetSignUp = "https://10.0.1.4:5000/auth_rec_signup"
 )
 
 var users = make(map[string]User)

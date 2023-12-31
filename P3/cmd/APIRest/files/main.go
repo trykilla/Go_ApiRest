@@ -23,8 +23,8 @@ type User struct {
 }
 
 const (
-	urlPost = "https://myserver.local:5000/files_rec_post"
-	urlDelete = "https://myserver.local:5000/files_rec_delete"	
+	urlPost = "https://10.0.1.4:5000/files_rec_post"
+	urlDelete = "https://10.0.1.4:5000/files_rec_delete"	
 )
 
 var userDocs map[string]string
