@@ -1,0 +1,22 @@
+Host jump
+	HostName 172.17.0.2
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/dev_key"
+	User jump
+	
+Host work
+	HostName 10.0.3.3
+	User op
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/op_key"
+	ProxyJump jump
+
+Host jump-as-op
+	Hostname 10.0.1.3
+	User op
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/op_key"
+	ProxyJump work
+
+Host work-as-dev
+	Hostname 10.0.3.3
+	User dev
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/dev_key"
+	ProxyJump jump
