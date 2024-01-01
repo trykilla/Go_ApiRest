@@ -9,7 +9,6 @@ import time
 
 from tqdm import tqdm
 
-access_token = None
 
 OK_STATUS_CODE = 200
 BAD_REQUEST_STATUS_CODE = 400
@@ -26,6 +25,7 @@ warnings.filterwarnings("ignore")
 
 
 class APITests(unittest.TestCase):
+    access_token = None
 
     def setUp(self):
         # Configuración inicial, se ejecuta antes de cada prueba
@@ -54,8 +54,6 @@ class APITests(unittest.TestCase):
         data = {"username": "test_user", "password": "test_password"}
         response = requests.post(url, json=data, verify=self.verify_ssl)
 
-        # print(response.json())
-
         expected_status_codes = [OK_STATUS_CODE, CONFLICT_STATUS_CODE]
 
         self.assertIn(response.status_code, expected_status_codes)
@@ -72,7 +70,8 @@ class APITests(unittest.TestCase):
         url = f"{self.base_url}/login"
         data = {"username": "test_user", "password": "test_password"}
         response = requests.post(url, json=data, verify=self.verify_ssl)
-
+        self.access_token = response.json()["access_token"]
+        print("access_token: ", self.access_token)
         self.assertEqual(response.status_code, OK_STATUS_CODE)
         # Permitir varias respuestas correctas
         self.assertIn("access_token", response.json())
@@ -80,11 +79,60 @@ class APITests(unittest.TestCase):
         time.sleep(2)
 
     def test_post_file(self):
-        url = f"{self.base_url}/test_user/test_doc"
+        # Prueba para la ruta /test_user/test_doc
+        header = introduce_access_token(self.access_token)
+        url = f"{self.base_url}/test_user/test_doc_new"
         data = {"doc_content": "test_content"}
-        response = requests.post(url, json=data, verify=self.verify_ssl)
+
+        expected_status_codes = [OK_STATUS_CODE, BAD_REQUEST_STATUS_CODE]
+        response = requests.post(
+            url, json=data, headers=header, verify=self.verify_ssl)
+        self.assertIn(response.status_code, expected_status_codes)
+        if response.status_code == OK_STATUS_CODE:
+            self.assertIn("size", response.json())
+        if response.status_code == BAD_REQUEST_STATUS_CODE:
+            print("[POST_FILE] Bad request.")
+            self.assertIn(response.json()["error"], "Doc already exists.")
+
+    def test_get_doc(self):
+
+        header = introduce_access_token(self.access_token)
+        url = f"{self.base_url}/test_user/test_doc"
+        
+        expected_status_codes = [OK_STATUS_CODE, NOT_FOUND_STATUS_CODE]
+        
+        response = requests.get(url, headers=header, verify=self.verify_ssl)
+        print(response.json())
+        if response.status_code == OK_STATUS_CODE:
+            self.assertIn("doc_content", response.json())
+        if response.status_code == NOT_FOUND_STATUS_CODE:
+            print("[GET_DOC] Doc not found.")
+            self.assertIn(response.json()["error"], "Wrong id for this user, doc not found or removed.")
+
+    def test_get_all_docs(self):
+        header = introduce_access_token(self.access_token)
+
+        url = f"{self.base_url}/test_user/_all_docs"
+        response = requests.get(url, headers=header, verify=self.verify_ssl)
+        print(response.json())
         self.assertEqual(response.status_code, OK_STATUS_CODE)
-        self.assertIn("doc_content", response.json())
+
+    def test_delete_doc(self):
+        header = introduce_access_token(self.access_token)
+        url = f"{self.base_url}/test_user/test_doc_new"
+        response = requests.delete(url, headers=header, verify=self.verify_ssl)
+        print(response.json())
+        self.assertEqual(response.status_code, OK_STATUS_CODE)
+        # quiero que compruebe si hay exactamente una llave vacía: {}
+        self.assertEqual(response.json(), {})
+
+
+def introduce_access_token(access_token):
+    access_token = input("Introduce access_token: ")
+    access_token = "token " + access_token
+    header = {"Authorization": access_token}
+    return header
+
     # Agrega más pruebas según sea necesario
 
 
@@ -95,6 +143,9 @@ if __name__ == '__main__':
     suite.addTest(APITests("test_sign_up_new_user"))
     suite.addTest(APITests("test_login_user"))
     suite.addTest(APITests("test_post_file"))
+    suite.addTest(APITests("test_get_doc"))
+    suite.addTest(APITests("test_get_all_docs"))
+    suite.addTest(APITests("test_delete_doc"))
 
     result = unittest.TestResult()
 

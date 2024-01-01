@@ -20,3 +20,22 @@ Host work-as-dev
 	User dev
 	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/dev_key"
 	ProxyJump jump
+
+Host broker
+	Hostname 10.0.1.4
+	User op
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/op_key"
+	ProxyJump work
+
+Host auth
+	Hostname 10.0.2.3
+	User op
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/op_key"
+	ProxyJump work
+
+Host files
+	Hostname 10.0.2.4
+	User op
+	IdentityFile "/home/oem/Desktop/Seguridad Redes/P3/Go_ApiRest/docker-ssh/demo-ssh/op_key"
+	ProxyJump work
+

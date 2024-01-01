@@ -2,7 +2,6 @@
 
 # Configuración de iptables para permitir la comunicación en la red dmz
 
-
 ip route del default
 ip route add default via 10.0.2.2 dev eth0
 
@@ -32,17 +31,17 @@ iptables -A OUTPUT -i eth0 -p tcp --dport 443 -j ACCEPT
 # Permitir tráfico en interfaz loopback
 iptables -A INPUT -i lo -j ACCEPT
 
+iptables -A INPUT -p tcp --dport 22 -s 10.0.2.2 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -s 10.0.3.3 -j ACCEPT
+iptables -A INPUT -p tcp --sport 22 -s 10.0.3.0/24 -j ACCEPT
+
 # Permitir ping
 iptables -A INPUT -p icmp -j ACCEPT
-iptables -A OUTPUT -p icmp -j ACCEPT
 
 sysctl -w net.ipv4.ip_forward=1
-
-sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
 
 service ssh start
 service rsyslog start
 
 # Ejecutar el comando proporcionado o iniciar el shell si no se proporciona ningún comando
 ./files
-

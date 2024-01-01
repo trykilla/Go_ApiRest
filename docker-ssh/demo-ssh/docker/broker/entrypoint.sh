@@ -43,11 +43,15 @@ iptables -A INPUT -i lo -j ACCEPT
 
 # Permitir ping
 iptables -A INPUT -p icmp -j ACCEPT
-iptables -A OUTPUT -p icmp -j ACCEPT
+
+#ssh
+
+iptables -A INPUT -p tcp --dport 22 -s 10.0.3.3 -j ACCEPT
+iptables -A INPUT -p tcp --sport 22 -s 10.0.3.0/24 -j ACCEPT
 
 sysctl -w net.ipv4.ip_forward=1
 
-sed -i 's/^PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+
 
 
 service ssh start
