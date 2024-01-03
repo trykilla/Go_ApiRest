@@ -34,7 +34,8 @@ build:
 	docker build --rm -f docker/auth/Dockerfile --tag auth docker/auth
 	docker build --rm -f docker/files/Dockerfile --tag files docker/files
 
-
+run_tests:
+	./tests
 
 network:
 	-docker network create -d bridge --subnet 10.0.1.0/24 dmz
