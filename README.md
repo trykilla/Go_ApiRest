@@ -4,21 +4,11 @@ This project implements a Go-based REST API for user management and document han
 
 With the new features, the API is now running into several containers with Docker where the services are connected by a container called "Router" that is the one that exposes the API to the outside. The containers are:
 
-*Router*
-
-*Jump*
-
-*Broker*
-
-*Auth*
-
-*Files*
-
-*Work*
+*Router* *Jump* *Broker* *Auth* *Files* *Work*
 
 In this new modified version, the API is divided into three services, where broker redirects the requests to the corresponding service through the router. This is achieved thanks to the firewall that is implemented through some iptables in each container.
 
-In this new version we can also access the containers through ssh. We have two users: op (who can access all the containers with sudo privileges) and dev (who can only access the work container). We can only access the containers through some jumps following a certain data flow. To access by ssh in a easier way we can add the [config](P4/docker-ssh/demo-ssh/config) file to our .ssh folder and then we can access the containers using ssh + the host name used in the config file. For example, to access the work container as dev we can use *work-as-dev*.
+In this new version we can also access the containers through ssh. We have two users: op (who can access all the containers with sudo privileges) and dev (who can only access the work container). We can only access the containers through some jumps following a certain jump flow. We'll use jump->work->any_container and to enter work we use only jump->work. To access by ssh in a easier way we can add the [config](P4/docker-ssh/demo-ssh/config) file to our .ssh folder and then we can access the containers using ssh + the host name used in the config file. For example, to access the work container as dev we can use *work-as-dev*.
 
 
 ## Endpoints
