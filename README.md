@@ -1,21 +1,33 @@
-# Go REST API with Gin and JWT
+# Go REST API with Gin and JWT (Modified for P4)
 
 This project implements a Go-based REST API for user management and document handling using the Gin framework. It includes user authentication, user creation, document retrieval, creation, update, and deletion.
 
-## Project Structure
+With the new features, the API is now running into several containers with Docker where the services are connected by a container called "Router" that is the one that exposes the API to the outside. The containers are:
 
-- **main.go**: Main logic for route configuration and HTTP request handling.
-- **cmd/APIRest/docs/**: Directory storing user-associated documents.
-- **cmd/APIRest/users.json**: JSON file storing user credentials.
-- **cmd/APIRest/run.sh**: Bash script for running the application.
+*Router*
 
-## Dependencies
+*Jump*
 
-- [Gin](https://github.com/gin-gonic/gin): Framework for building APIs in Go.
-- [bcrypt](https://golang.org/x/crypto/bcrypt): Library for secure password hashing.
-- [jwt-go](https://github.com/dgrijalva/jwt-go): JSON Web Tokens for authentication.
+*Broker*
+
+*Auth*
+
+*Files*
+
+*Work*
+
+In this new modified version, the API is divided into three services, where broker redirects the requests to the corresponding service through the router. This is achieved thanks to the firewall that is implemented through some iptables in each container.
+
+In this new version we can also access the containers through ssh. We have two users: op (who can access all the containers with sudo privileges) and dev (who can only access the work container). We can only access the containers through some jumps following a certain data flow. To access by ssh in a easier way we can add the [config](P4/docker-ssh/demo-ssh/config) file to our .ssh folder and then we can access the containers using ssh + the host name used in the config file. For example, to access the work container as dev we can use *work-as-dev*.
+
 
 ## Endpoints
+
+Endpoints stay the same as in the original version, we only change the url or add it to our /etc/hosts file: ![url](hosts.png)
+
+
+
+The url should be *https://myserver.local:5000*.
 
 1. **Get API Version**
    - Method: `GET`
@@ -26,12 +38,14 @@ This project implements a Go-based REST API for user management and document han
    - Method: `POST`
    - Path: `/signup`
    - Request Body:
+
      ```json
      {
        "username": "newUser",
        "password": "newPassword"
      }
      ```
+
      Post a new user with the given username and password. The password will be hashed and stored in the `users.json` file.
      Returns a JWT token for the new user.
 
@@ -39,12 +53,14 @@ This project implements a Go-based REST API for user management and document han
    - Method: `POST`
    - Path: `/login`
    - Request Body:
+
      ```json
      {
        "username": "existingUser",
        "password": "existingPassword"
      }
      ```
+
       Returns a JWT token for the existing user.
 
 4. **Get Documents Associated with a User**
@@ -58,11 +74,13 @@ This project implements a Go-based REST API for user management and document han
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
    - Request Body:
+
    ```json
      {
        "doc_content": "This is the content of the document."
      }
      ```
+
    Creates a new document with the given ID associated with the given user.
 
 6. **Update Document**
@@ -70,11 +88,13 @@ This project implements a Go-based REST API for user management and document han
    - Path: `/:username/:doc_id`
    - Authorization Header: `Authorization: token <token>`
    - Request Body:
+
    ```json
      {
        "doc_content": "This is the updated content of the document."
      }
      ```
+
    Updates the document with the given ID associated with the given user.
 
 7. **Delete Document**
@@ -87,14 +107,6 @@ This project implements a Go-based REST API for user management and document han
 
 **How to start the API?**
 
-The script must be executed from the root directory of the project, in this case:  `P3/`
+To configure and start the containers and the api is very simple. We have a [Makefile](P4/docker-ssh/demo-ssh/Makefile) with several options. To build and run the containers we use *make run containers* and to stop and delete them we use *make remove && make clean*. The API will start automatically. We can also run some tests using *make run_tests*.
 
-```bash
-$ ./run.sh
-```
 
-The application will run on `myserver.local:5000`. Ensure proper hostname resolution or modify the address and port as needed. YOU MUST CHANGE `/etc/hosts` and change localhost to myserver.local: "127.0.0.1 myserver.local"
-
-## Automated Tests
-
-Testing is yet to be implemented.
