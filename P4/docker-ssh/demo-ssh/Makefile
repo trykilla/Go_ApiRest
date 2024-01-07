@@ -1,4 +1,4 @@
-.PHONY: build network container remove clean
+.PHONY: build network container remove clean run_tests
 
 containers: build network
 	docker run --privileged -p 5000:5000 --rm -ti -d --name router --hostname router midebian-router

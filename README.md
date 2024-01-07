@@ -99,4 +99,7 @@ The url should be *https://myserver.local:5000*.
 
 To configure and start the containers and the api is very simple. We have a [Makefile](P4/docker-ssh/demo-ssh/Makefile) with several options. To build and run the containers we use *make run containers* and to stop and delete them we use *make remove && make clean*. The API will start automatically. We can also run some tests using *make run_tests*.
 
+**Tests**
+
+Talking about the tests, there are cases that aren't controlled or tested but I did what I had time to do.
 
